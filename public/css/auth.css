@@ -1,0 +1,289 @@
+/* auth.css - Shared styles for login and register pages */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, sans-serif;
+    background-color: #f5f5f5;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-container {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 440px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+    gap: 12px;
+}
+
+.logo-circle {
+    background: #1a7b3e;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.logo-circle i {
+    color: white;
+    font-size: 24px;
+}
+
+.logo-text {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a7b3e;
+}
+
+.page-title {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+label {
+    display: block;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper i {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 16px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="tel"] {
+    width: 100%;
+    padding: 16px 18px;
+    border: 2px solid #e0e0e0;
+    border-radius: 50px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.input-wrapper input {
+    padding-left: 50px;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="tel"]:focus {
+    border-color: #1a7b3e;
+    box-shadow: 0 0 0 3px rgba(26, 123, 62, 0.1);
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 5px;
+    display: block;
+}
+
+.btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn-primary {
+    background: #2d2d2d;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.btn-primary:hover {
+    background: #1a1a1a;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(45, 45, 45, 0.3);
+}
+
+.btn-secondary {
+    background: white;
+    color: #2d2d2d;
+    border: 2px solid #e0e0e0;
+}
+
+.btn-secondary:hover {
+    border-color: #1a7b3e;
+    color: #1a7b3e;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 123, 62, 0.1);
+}
+
+.back-to-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    text-decoration: none;
+    color: #2d2d2d;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.back-to-login:hover {
+    color: #1a7b3e;
+}
+
+.back-icon {
+    width: 32px;
+    height: 32px;
+    border: 2px solid #e0e0e0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.forgot-password {
+    text-align: right;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.forgot-password a {
+    color: #1a7b3e;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.forgot-password a:hover {
+    text-decoration: underline;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 30px 24px;
+    }
+
+    .logo-circle {
+        width: 45px;
+        height: 45px;
+    }
+
+    .logo-circle i {
+        font-size: 22px;
+    }
+
+    .logo-text {
+        font-size: 28px;
+    }
+
+    .page-title {
+        font-size: 28px;
+    }
+
+    .page-subtitle {
+        font-size: 13px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    label {
+        font-size: 15px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="tel"] {
+        padding: 14px 16px;
+        font-size: 15px;
+    }
+
+    .input-wrapper input {
+        padding-left: 45px;
+    }
+
+    .input-wrapper i {
+        left: 16px;
+        font-size: 15px;
+    }
+
+    .btn {
+        padding: 14px;
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 360px) {
+    .auth-container {
+        padding: 25px 20px;
+    }
+
+    .logo-text {
+        font-size: 24px;
+    }
+
+    .page-title {
+        font-size: 24px;
+    }
+}
