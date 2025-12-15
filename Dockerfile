@@ -19,10 +19,6 @@ RUN apt-get update && apt-get install -y \
 # Enable Apache mod_rewrite (needed for Laravel routes)
 RUN a2enmod rewrite
 
-# Configure Apache to listen on PORT environment variable (Render requirement)
-RUN sed -i 's/Listen 80/Listen ${PORT:-10000}/' /etc/apache2/ports.conf \
-    && sed -i 's/<VirtualHost \*:80>/<VirtualHost *:${PORT:-10000}>/' /etc/apache2/sites-available/000-default.conf
-
 # SET Apache DocumentRoot to /var/www/html/public
 RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
@@ -54,8 +50,15 @@ RUN mkdir -p /var/www/html/public/storage/product \
     && chmod -R 775 /var/www/html/storage \
     && chmod -R 775 /var/www/html/bootstrap/cache
 
+# Create startup script
+RUN echo '#!/bin/bash\n\
+sed -i "s/Listen 80/Listen ${PORT:-10000}/" /etc/apache2/ports.conf\n\
+sed -i "s/<VirtualHost \\*:80>/<VirtualHost *:${PORT:-10000}>/" /etc/apache2/sites-available/000-default.conf\n\
+exec apache2-foreground' > /start.sh \
+    && chmod +x /start.sh
+
 # Expose Render's required port
 EXPOSE 10000
 
-# Start Apache
-CMD ["apache2-foreground"]
+# Start Apache with dynamic port configuration
+CMD ["/start.sh"]
