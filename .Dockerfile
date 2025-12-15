@@ -11,39 +11,35 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    nodejs \
+    npm \
     && docker-php-ext-configure gd --with-jpeg --with-freetype \
     && docker-php-ext-install pdo pdo_mysql zip gd
 
 # Enable Apache mod_rewrite (needed for Laravel routes)
 RUN a2enmod rewrite
 
+# Configure Apache to listen on PORT environment variable (Render requirement)
+RUN sed -i 's/Listen 80/Listen ${PORT:-10000}/' /etc/apache2/ports.conf \
+    && sed -i 's/<VirtualHost \*:80>/<VirtualHost *:${PORT:-10000}>/' /etc/apache2/sites-available/000-default.conf
+
 # SET Apache DocumentRoot to /var/www/html/public
-RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
-    && sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/apache2.conf
+RUN sed -i 's|/var/www/html|/var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
+
+# Allow .htaccess overrides
+RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
 # Set Working dir
 WORKDIR /var/www/html
 
-# COPY APP code
-COPY . /var/www/html/
-
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer 
 
-# Copy .env.example to .env for build process (will be overridden by Render env vars at runtime)
-RUN cp .env.example .env || true
+# COPY APP code
+COPY . /var/www/html/
 
-# Set a temporary APP_KEY just for the build process
-RUN sed -i 's/APP_KEY=$/APP_KEY=base64:temporary_build_key_12345678901234567890123456789012/' .env
-
-# Install Laravel dependencies with --no-scripts to avoid env issues
-RUN composer install --no-dev --optimize-autoloader --no-scripts
-
-# Now run the post-install scripts
-RUN composer run-script post-autoload-dump
-
-# Install Node + npm
-RUN apt-get update && apt-get install -y nodejs npm
+# Install Laravel dependencies
+RUN composer install --no-dev --optimize-autoloader
 
 # Build frontend assets
 RUN npm install && npm run build
@@ -58,20 +54,8 @@ RUN mkdir -p /var/www/html/public/storage/product \
     && chmod -R 775 /var/www/html/storage \
     && chmod -R 775 /var/www/html/bootstrap/cache
 
-# Create storage link
-RUN php artisan storage:link
-
 # Expose Render's required port
 EXPOSE 10000
 
 # Start Apache
 CMD ["apache2-foreground"]
-
-# Install Laravel dependencies
-RUN composer install --no-dev --optimize-autoloader --no-scripts
-
-# Generate optimized autoload files
-RUN composer dump-autoload --optimize
-
-# Clear and cache Laravel config (do this at runtime, not build)
-# RUN php artisan config:cache
