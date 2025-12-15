@@ -172,7 +172,7 @@ class AdminProductController extends Controller
         'name' => 'required|string|max:255',
         'category' => 'required|in:grocery,vegetable',
         'price' => 'required|numeric|min:0',
-        'unit' => 'required|in:per kilo,per piece,per pack,per bundle',
+        'unit' => 'required|in:per kg,piece,pack,bundle',
         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
     ]);
 
