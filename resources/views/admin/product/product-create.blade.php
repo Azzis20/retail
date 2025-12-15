@@ -67,9 +67,6 @@
             @enderror
         </div>
 
-
-        
-
         <!-- Price and Unit Row -->
         <div class="form-row">
             <div class="form-group">
