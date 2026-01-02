@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('vendor.layouts.app')
 
 @section('title', 'Dashboard')
 
@@ -16,7 +16,7 @@
     <div class="stats-container"> 
 
         <!-- Fixed: Removed action-card class wrapper, using stat-card-link instead -->
-        <a href="{{ route('admin.order.index') }}" class="stat-card-link">
+        <a href="{{ route('vendor.order.index') }}" class="stat-card-link">
             <div class="stat-card">  
                 <div class="stat-content">
                     <div class="stat-icon">
@@ -30,7 +30,7 @@
             </div>
         </a>
         
-        <a href="{{ route('admin.product.index') }}" class="stat-card-link"> 
+        <a href="{{ route('vendor.product.index') }}" class="stat-card-link"> 
             <div class="stat-card">  
                 <div class="stat-content">
                     <div class="stat-icon">
@@ -49,7 +49,7 @@
         <div class="stats-container"> 
 
         <!-- Fixed: Removed action-card class wrapper, using stat-card-link instead -->
-        <a href="{{ route('admin.sales.index') }}" class="stat-card-link">
+        <a href="{{ route('vendor.sales.index') }}" class="stat-card-link">
             <div class="stat-card">  
                 <div class="stat-content">
                     <div class="stat-icon">
@@ -63,19 +63,7 @@
             </div>
         </a>
         
-        <a href="{{ route('admin.customer.index') }}" class="stat-card-link"> 
-            <div class="stat-card">  
-                <div class="stat-content">
-                    <div class="stat-icon">
-                        <i class="fa-solid fa-user"></i>    
-                    </div>
-                    <div class="stat-info">
-                        <p class="stat-label">Client</p>
-                        <h3 class="stat-value">{{$totalCustomer}}</h3>
-                    </div>
-                </div>
-            </div>
-        </a>
+
 
     </div>
 
@@ -86,7 +74,7 @@
     
     <div class="orders-header">
         <h2 class="section-title">Recent Orders</h2>
-        <a href="{{ route('admin.order.index') }}" class="view-all-link">View All</a>
+        <a href="{{ route('vendor.order.index') }}" class="view-all-link">View All</a>
     </div>
 
     <div class="orders-container">
@@ -95,7 +83,7 @@
                 <i class="fa-solid fa-box-open"></i>
                 <p>No orders found</p>
                 @if(request('search'))
-                <a href="{{ route('admin.order.index') }}" class="btn-clear-search">Clear Search</a>
+                <a href="{{ route('vendor.order.index') }}" class="btn-clear-search">Clear Search</a>
                 @endif
         </div>
     @else
@@ -103,7 +91,7 @@
 
         @foreach($orders as $order) 
 
-        <a href="{{ route('admin.order.show',$order->id) }}">
+        <a href="{{ route('vendor.order.show',$order->id) }}">
             <div class="order-card-item">
                 
                 <div class="order-info">

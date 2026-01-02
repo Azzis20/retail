@@ -8,12 +8,17 @@ use App\Http\Controllers\Admin\AdminManageController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\SalesController; 
-use App\Http\Controllers\Admin\CustomerController; 
+use App\Http\Controllers\Admin\CustomerController;  //
+use App\Http\Controllers\Admin\NotificationController;
 
 
 
-use App\Http\Controllers\Vendor\VendorDashboardController; //VendorOrderController
-use App\Http\Controllers\Vendor\VendorOrderController; //AdminOrderController
+use App\Http\Controllers\Vendor\VendorDashboardController; 
+use App\Http\Controllers\Vendor\VendorOrderController; 
+use App\Http\Controllers\Vendor\VendorProductController;
+use App\Http\Controllers\Vendor\VendorSalesController;
+use App\Http\Controllers\Vendor\VendorNotificationController;
+
 
 
 
@@ -32,8 +37,9 @@ Route::get('/', [AuthController::class,'loginPage'])->name('login.page');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/register', [AuthController::class,'registerShow'])->name('register.page');
 Route::post('/register', [AuthController::class, 'register'])->name('register');//register
-Route::get('/forgot-password', [AuthController::class,'forgotPassword'])->name('forgot.password');
+
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/forgot-password', [AuthController::class,'forgotPassword'])->name('forgot.password');
 
 
 
@@ -43,9 +49,19 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->group(function () {
 
 
-    Route::get('dashboard', [VendorDashboardController::class, 'index'])->name('dashboard');
+   //notification
+   Route::controller(VendorNotificationController::class)->prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::patch('/{id}/mark-read', 'markAsRead')->name('markRead');
+        Route::get('/{id}/mark-read', 'markAsRead')->name('markRead');
+        
+        Route::post('/mark-all-read', 'markAllAsRead')->name('markAllRead');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+        Route::get('/unread-count', 'getUnreadCount')->name('unreadCount');
+    });
 
-
+    //dashboard
+     Route::get('dashboard', [VendorDashboardController::class, 'index'])->name('dashboard');
 
     //order
     Route::get('orders', [VendorOrderController::class, 'index'])->name('order.index');
@@ -56,7 +72,7 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
     Route::get('orders/search', [VendorOrderController::class, 'search'])->name('order.search'); //outForDelivery
     Route::patch('orders/out-for-delivery/{id}', [VendorOrderController::class, 'outForDelivery'])->name('orders.deliveried');
 
-      //Paymnet
+      //Payment
     Route::get('orders/{id}/payment', [VendorOrderController::class, 'recordPayment'])
         ->name('order.payment');
     
@@ -66,6 +82,23 @@ Route::middleware(['auth', 'role:vendor'])->prefix('vendor')->name('vendor.')->g
     //Sales
     Route::get('sales', [VendorSalesController::class, 'index'])->name('sales.index');
     Route::get('sales/{id}/show', [VendorSalesController::class, 'show'])->name('sales.show');
+
+
+    // product
+
+    Route::get('product', [VendorProductController::class, 'index'])->name('product.index');
+    Route::get('product/create', [VendorProductController::class, 'create'])->name('product.create');
+    Route::post('product', [VendorProductController::class, 'store'])->name('product.store');
+    
+    Route::get('product/{id}/edit', [VendorProductController::class, 'edit'])->name('product.edit');
+    Route::delete('product/{id}/', [VendorProductController::class, 'destroy'])->name('product.destroy');
+    Route::put('product/{id}', [VendorProductController::class, 'update'])->name('product.update');
+
+    Route::get('product/search', [VendorProductController::class, 'search'])->name('product.search');
+    Route::get('product/vegetable', [VendorProductController::class, 'selectVegetable'])->name('product.vegetable');
+    Route::get('product/grocery', [VendorProductController::class, 'selectGrocery'])->name('product.grocery');
+    Route::get('products/filter-stock', [VendorProductController::class, 'filterByStock'])
+    ->name('product.filter-stock');
 
 
 
@@ -82,6 +115,23 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     //dashboard
     Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    //Notification
+    Route::controller(NotificationController::class)->prefix('notifications')->name('notifications.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::patch('/{id}/mark-read', 'markAsRead')->name('markRead');
+        Route::get('/{id}/mark-read', 'markAsRead')->name('markRead');
+        
+        Route::post('/mark-all-read', 'markAllAsRead')->name('markAllRead');
+        Route::delete('/{id}', 'destroy')->name('destroy');
+
+        // NEW: Delete all notifications route
+        Route::delete('/', [NotificationController::class, 'destroyAll'])->name('destroyAll');
+        
+        Route::get('/unread-count', 'getUnreadCount')->name('unreadCount');
+
+    });
+   
 
     //employee management
     Route::get('manage', [AdminManageController::class, 'index'])->name('manage.index');
@@ -135,6 +185,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('product/search', [AdminProductController::class, 'search'])->name('product.search');
     Route::get('product/vegetable', [AdminProductController::class, 'selectVegetable'])->name('product.vegetable');
     Route::get('product/grocery', [AdminProductController::class, 'selectGrocery'])->name('product.grocery');
+    Route::get('products/filter-stock', [AdminProductController::class, 'filterByStock'])
+    ->name('product.filter-stock');
 
 
     Route::get('sales', [SalesController::class, 'index'])->name('sales.index');
@@ -183,12 +235,6 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
     //profile
     Route::get('profile/{id}', [ProfileController::class, 'index'])->name('profile.index');
 
-   
-
-
-
-
-
 
 
  Route::get('wishlist', [CustomerDashboardController::class, 'wishlist'])->name('wishlist');
@@ -201,12 +247,12 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->name('customer
 
 
 
-//?
-// Both admin and vendor can access these routes 
-Route::middleware(['auth', 'role:admin,vendor'])->prefix('management')->name('management.')->group(function () {
-    Route::get('reports', [ReportController::class, 'index'])->name('reports');
-    Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics');
-});
+// //?
+// // Both admin and vendor can access these routes 
+// Route::middleware(['auth', 'role:admin,vendor'])->prefix('management')->name('management.')->group(function () {
+//     Route::get('reports', [ReportController::class, 'index'])->name('reports');
+//     Route::get('analytics', [AnalyticsController::class, 'index'])->name('analytics');
+// });
 
 
 

@@ -55,7 +55,7 @@ class VendorSalesController extends Controller
             
             $bills = $billsQuery->paginate(6)->appends($request->except('page'));
             
-            return view('admin.sales.sales-index', compact(
+            return view('vendor.sales.sales-index', compact(
                 'bills',
                 'monthlySales',
                 'yearlySales',
@@ -86,7 +86,7 @@ class VendorSalesController extends Controller
         // Paginate results and append query parameters
         $payments = $query->paginate(6)->appends($request->except('page'));
         
-        return view('admin.sales.sales-index', compact(
+        return view('vendor.sales.sales-index', compact(
             'payments',
             'monthlySales',
             'yearlySales',

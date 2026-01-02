@@ -1,0 +1,15 @@
+        <!-- <a href="{{ route('vendor.customer.index') }}" class="stat-card-link"> 
+            <div class="stat-card">  
+                <div class="stat-content">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-user"></i>    
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Client</p>
+                        <h3 class="stat-value">{{$totalCustomer}}</h3>
+                    </div>
+                </div>
+            </div>
+        </a> -->
+
+        

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Vendor;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -10,9 +10,9 @@ use App\Models\User;
 use App\Models\Payment;
 use Illuminate\Support\Facades\DB; 
 
-class VendorOrderController extends Controller
+class AdminOrderController extends Controller
 {
-     /**
+    /**
      * Display a listing of the resource.
      */
     public function index()
@@ -22,7 +22,7 @@ class VendorOrderController extends Controller
                ->with(['customer', 'processedBy', 'bill']) 
                ->paginate(6);
    
-        return view('vendor.order.order-index', compact('orders'))->with('status','all');
+        return view('admin.order.order-index', compact('orders'))->with('status','all');
     }
 
 
@@ -32,7 +32,7 @@ class VendorOrderController extends Controller
         $orders = Order::where('status', 'completed')
             ->paginate(5);
 
-        return view('vendor.order.order-index', compact('orders'))->with('status', 'completed');
+        return view('admin.order.order-index', compact('orders'))->with('status', 'completed');
     }
 
 
@@ -43,7 +43,7 @@ class VendorOrderController extends Controller
         $orders = Order::where('status', 'Out-for-delivery') //out for delivery
             ->paginate(5);
 
-        return view('vendor.order.order-index', compact('orders'))->with('status', 'Out-for-delivery');
+        return view('admin.order.order-index', compact('orders'))->with('status', 'Out-for-delivery');
     }
     
        public function selectPending() //pending
@@ -51,7 +51,7 @@ class VendorOrderController extends Controller
         $orders = Order::where('status', 'pending')
             ->paginate(5);
 
-        return view('vendor.order.order-index', compact('orders'))->with('status', 'pending');
+        return view('admin.order.order-index', compact('orders'))->with('status', 'pending');
     }
     
 
@@ -61,7 +61,7 @@ class VendorOrderController extends Controller
     public function create()
     {
         
-        return view('vendor.manage.staff-create');
+        return view('admin.manage.staff-create');
     }
  
 
@@ -83,7 +83,7 @@ class VendorOrderController extends Controller
             ->appends(['search' => $search]);
 
 
-        return view('vendor.order.order-index', compact('orders'))->with('status','search');
+        return view('admin.order.order-index', compact('orders'))->with('status','search');
     }
 
     public function outForDelivery(Request $request, $id)
@@ -99,7 +99,7 @@ class VendorOrderController extends Controller
     ]);
 
     // 3. Redirect back with a success message
-    return redirect()->route('vendor.order.index')->with('success', 'Order is now out for delivery!');
+    return redirect()->route('admin.order.index')->with('success', 'Order is now out for delivery!');
 }
 
 
@@ -126,7 +126,7 @@ class VendorOrderController extends Controller
         $order = Order::with(['customer', 'processedBy'])->findOrFail($id);
 
         // Pass the order to the view
-        return view('vendor.order.order-show', compact('order'));
+        return view('admin.order.order-show', compact('order'));
     }
 
         public function recordPayment(string $id)
@@ -137,7 +137,7 @@ class VendorOrderController extends Controller
             'bill.payments.recordedBy'
         ])->findOrFail($id);
 
-        return view('vendor.order.order-payment', compact('order'));
+        return view('admin.order.order-payment', compact('order'));
     }
 
 
@@ -195,4 +195,6 @@ class VendorOrderController extends Controller
 
     
 
+
+    
 }

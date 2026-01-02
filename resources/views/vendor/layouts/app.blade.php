@@ -18,16 +18,82 @@
             <span></span>
             <span></span>
         </div>
-        <div class="header-title">@yield('page-title', 'Admin Panel')</div>
+        <div class="header-title">
+            @yield('page-title', 'Admin Panel')
+
+        </div>
+
+
+    
+        <!-- Add Notification Bell -->
+        <div class="notification-bell">
+            <button class="notification-bell-btn" id="notificationBellBtn">
+                <i class="fa-solid fa-bell notification-bell-icon"></i>
+                @php
+                    $unreadCount = \App\Services\NotificationService::getUnreadCount();
+                @endphp
+                @if($unreadCount > 0)
+                    <span class="notification-badge">{{ $unreadCount > 99 ? '99+' : $unreadCount }}</span>
+                @endif
+            </button>
+
+            <!-- Notification Dropdown -->
+            <div class="notification-dropdown" id="notificationDropdown">
+                <div class="notification-dropdown-header">
+                    <span class="notification-dropdown-title">Notifications</span>
+                    <a href="{{ route('vendor.notifications.index') }}" class="btn-view-all-notifications">
+                        View All
+                    </a>
+                </div>
+                <div class="notification-dropdown-body">
+                    @php
+                        $recentNotifications = \App\Services\NotificationService::getRecentNotifications(5);
+                    @endphp
+                    
+                    @forelse($recentNotifications as $notification)
+                        <a href="{{ route('vendor.notifications.markRead', $notification->id) }}" 
+                        class="notification-dropdown-item {{ $notification->is_read ? 'read' : 'unread' }}">
+                            <div class="notification-dropdown-item-header">
+                                <h4 class="notification-dropdown-item-title">{{ $notification->title }}</h4>
+                                <span class="notification-dropdown-item-time">{{ $notification->created_at->diffForHumans() }}</span>
+                            </div>
+                            <p class="notification-dropdown-item-message">{{ Str::limit($notification->message, 80) }}</p>
+                        </a>
+                    @empty
+                        <div class="notification-dropdown-empty">
+                            <i class="fa-solid fa-bell-slash"></i>
+                            <p>No notifications</p>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
     </div>
+    
+    
+  
+    
 
     <!-- Sidebar Navigation -->
     <nav class="sidebar" id="sidebar">
         <ul class="nav-menu">
+
+             <!-- newly added -->
+            <div class="logo-section">
+                <div class="logo-circle">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                </div>
+                <div class="logo-text">HarisStore</div>
+            </div>
             
             <li class="nav-item">
-                <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('vendor.dashboard') }}" class="nav-link {{ request()->routeIs('vendor.dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-house"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('vendor.product.index') }}" class="nav-link {{ request()->routeIs('vendor.product*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-boxes-stacked"></i> Inventory
                 </a>
             </li>
 
@@ -35,12 +101,12 @@
             
 
             <li class="nav-item">
-                <a href="{{ route('admin.order.index') }}" class="nav-link {{ request()->routeIs('admin.order*') ? 'active' : '' }}">
+                <a href="{{ route('vendor.order.index') }}" class="nav-link {{ request()->routeIs('vendor.order*') ? 'active' : '' }}">
                     <i class="fa-solid fa-basket-shopping"></i> Order
                 </a>
             </li>
             <li class="nav-item">
-                <a href="{{ route('admin.sales.index') }}" class="nav-link {{ request()->routeIs('admin.sales*') ? 'active' : '' }}">
+                <a href="{{ route('vendor.sales.index') }}" class="nav-link {{ request()->routeIs('vendor.sales*') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-line"></i> Sales
                 </a>
             </li>
@@ -158,6 +224,51 @@
         function confirmLogout() {
             openLogoutModal();
         }
+        
+        //Notification
+         const notificationBellBtn = document.getElementById('notificationBellBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+
+    if (notificationBellBtn && notificationDropdown) {
+        notificationBellBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            notificationDropdown.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!notificationDropdown.contains(e.target) && !notificationBellBtn.contains(e.target)) {
+                notificationDropdown.classList.remove('active');
+            }
+        });
+
+        // Prevent dropdown from closing when clicking inside
+        notificationDropdown.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+
+    // Auto-refresh notification count every 30 seconds
+    setInterval(function() {
+        fetch('{{ route("admin.notifications.unreadCount") }}')
+            .then(response => response.json())
+            .then(data => {
+                const badge = document.querySelector('.notification-badge');
+                if (data.count > 0) {
+                    if (badge) {
+                        badge.textContent = data.count > 99 ? '99+' : data.count;
+                    } else {
+                        const newBadge = document.createElement('span');
+                        newBadge.className = 'notification-badge';
+                        newBadge.textContent = data.count > 99 ? '99+' : data.count;
+                        notificationBellBtn.appendChild(newBadge);
+                    }
+                } else if (badge) {
+                    badge.remove();
+                }
+            })
+            .catch(error => console.error('Error fetching notification count:', error));
+    }, 30000);
     </script>
 
     <!-- Logout Confirmation Modal -->
@@ -183,3 +294,5 @@
 
 </body>
 </html>
+
+

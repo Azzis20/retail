@@ -55,9 +55,9 @@
             @enderror
         </div>
 
-        <div class="forgot-password">
+        <!-- <div class="forgot-password">
             <a href="{{ route('forgot.password') }}">Forgot Password?</a>
-        </div>
+        </div> -->
 
         <button type="submit" class="btn btn-primary">Login</button>
     </form>

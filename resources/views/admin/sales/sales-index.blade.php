@@ -1,3 +1,4 @@
+
 @extends('admin.layouts.app')
 
 @section('title', 'Sales & Revenue')
@@ -141,74 +142,77 @@
                 <p>All bills have been paid!</p>
             </div>
         @else
-            <div class="orders-list">
-                @foreach($bills as $bill)
-                    <div class="payment-card">
-                        <!-- Bill Header -->
-                        <div class="payment-header">
-                            <div class="payment-date">
-                                <i>🕒</i>
-                                {{ $bill->created_at->format('M d, Y h:i A') }}
-                            </div>
-                            <div class="payment-amount-badge" style="background: #e74c3c;">
-                                ₱{{ number_format($bill->balance, 2) }}
-                            </div>
-                        </div>
-
-                        <!-- Customer Info -->
-                        <div class="payment-customer">
-                            <div class="customer-avatar">
-                                {{ strtoupper(substr($bill->order->customer->fname, 0, 1)) }}{{ strtoupper(substr($bill->order->customer->lname, 0, 1)) }}
-                            </div>
-                            <div class="payment-customer-info">
-                                <h3 class="payment-customer-name">
-                                    {{ $bill->order->customer->fname }} {{ $bill->order->customer->lname }}
-                                </h3>
-                                <p class="payment-customer-email">{{ $bill->order->customer->email }}</p>
-                            </div>
-                        </div>
-
-                        <!-- Bill Details -->
-                        <div class="payment-bill-details">
-                            <div class="payment-detail-row">
-                                <span class="payment-detail-label">Order ID:</span>
-                                <span class="payment-detail-value">ORD{{ str_pad($bill->order->id, 2, '0', STR_PAD_LEFT) }}</span>
-                            </div>
-                            <div class="payment-detail-row">
-                                <span class="payment-detail-label">Bill Total:</span>
-                                <span class="payment-detail-value">₱{{ number_format($bill->total_amount, 2) }}</span>
-                            </div>
-                            <div class="payment-detail-row">
-                                <span class="payment-detail-label">Amount Due:</span>
-                                <span class="payment-detail-value" style="color: #e74c3c; font-weight: 700;">
-                                    ₱{{ number_format($bill->balance, 2) }}
-                                </span>
-                            </div>
-                            <div class="payment-detail-row">
-                                <span class="payment-detail-label">Status:</span>
-                                <span class="payment-status-badge status-unpaid">
-                                    Unpaid
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div style="display: flex; gap: 8px; margin-top: 4px;">
-                            <a href="{{ route('admin.order.payment', $bill->order_id) }}" 
-                               class="btn-view-order" 
-                               style="flex: 1; background: linear-gradient(135deg, rgb(0, 200, 150) 0%, rgb(0, 180, 130) 100%);">
-                                <i>💰</i>
-                                Record Payment
-                            </a>
-                            <a href="{{ route('admin.order.show', $bill->order_id) }}" 
-                               class="btn-view-order" 
-                               style="flex: 1;">
-                                <i>👁️</i>
-                                View Order
-                            </a>
-                        </div>
-                    </div>
-                @endforeach
+            <!-- Desktop Table View -->
+            <div class="sales-table-wrapper">
+                <table class="sales-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Order ID</th>
+                            <th>Bill Total</th>
+                            <th>Amount Due</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($bills as $bill)
+                            <tr class="sales-table-row">
+                                <td data-label="Date">
+                                    <div class="table-cell-content">
+                                        <i class="fa-regular fa-clock"></i>
+                                        {{ $bill->created_at->format('M d, Y') }}
+                                        <span class="table-time">{{ $bill->created_at->format('h:i A') }}</span>
+                                    </div>
+                                </td>
+                                <td data-label="Customer">
+                                    <div class="table-customer">
+                                        <div class="table-customer-avatar">
+                                            {{ strtoupper(substr($bill->order->customer->fname, 0, 1)) }}{{ strtoupper(substr($bill->order->customer->lname, 0, 1)) }}
+                                        </div>
+                                        <div class="table-customer-info">
+                                            <div class="table-customer-name">
+                                                {{ $bill->order->customer->fname }} {{ $bill->order->customer->lname }}
+                                            </div>
+                                            <div class="table-customer-email">
+                                                {{ $bill->order->customer->email }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-label="Order ID">
+                                    <span class="table-order-id">ORD{{ str_pad($bill->order->id, 2, '0', STR_PAD_LEFT) }}</span>
+                                </td>
+                                <td data-label="Bill Total">
+                                    <span class="table-amount">₱{{ number_format($bill->total_amount, 2) }}</span>
+                                </td>
+                                <td data-label="Amount Due">
+                                    <span class="table-amount table-amount-due">₱{{ number_format($bill->balance, 2) }}</span>
+                                </td>
+                                <td data-label="Status">
+                                    <span class="table-status-badge status-unpaid">Unpaid</span>
+                                </td>
+                                <td data-label="Actions">
+                                    <div class="table-actions">
+                                        <a href="{{ route('admin.order.payment', $bill->order_id) }}" 
+                                           class="btn-table-action btn-payment" 
+                                           title="Record Payment">
+                                            <i class="fa-solid fa-dollar-sign"></i>
+                                            <span>Payment</span>
+                                        </a>
+                                        <a href="{{ route('admin.order.show', $bill->order_id) }}" 
+                                           class="btn-table-action btn-view" 
+                                           title="View Order">
+                                            <i class="fa-solid fa-eye"></i>
+                                            <span>View</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
 
             <!-- Pagination -->
@@ -226,64 +230,77 @@
                 <p>No payment records found</p>
             </div>
         @else
-            <div class="orders-list">
-                @foreach($payments as $payment)
-                    <div class="payment-card">
-                        <!-- Payment Header -->
-                        <div class="payment-header">
-                            <div class="payment-date">
-                                <i>🕒</i>
-                                {{ $payment->created_at->format('M d, Y h:i A') }}
-                            </div>
-                            <div class="payment-amount-badge">
-                                ₱{{ number_format($payment->amount, 2) }}
-                            </div>
-                        </div>
-
-                        <!-- Customer Info -->
-                        <div class="payment-customer">
-                            <div class="customer-avatar">
-                                {{ strtoupper(substr($payment->customer->fname, 0, 1)) }}{{ strtoupper(substr($payment->customer->lname, 0, 1)) }}
-                            </div>
-                            <div class="payment-customer-info">
-                                <h3 class="payment-customer-name">
-                                    {{ $payment->customer->fname }} {{ $payment->customer->lname }}
-                                </h3>
-                                <p class="payment-customer-email">{{ $payment->customer->email }}</p>
-                            </div>
-                        </div>
-
-                        <!-- Bill Details -->
-                        <div class="payment-bill-details">
-                            <div class="payment-detail-row">
-                                <span class="payment-detail-label">Order ID:</span>
-                                <span class="payment-detail-value">ORD{{ str_pad($payment->bill->order->id, 2, '0', STR_PAD_LEFT) }}</span>
-                            </div>
-                            <div class="payment-detail-row">
-                                <span class="payment-detail-label">Bill Total:</span>
-                                <span class="payment-detail-value">₱{{ number_format($payment->bill->total_amount, 2) }}</span>
-                            </div>
-                            <div class="payment-detail-row">
-                                <span class="payment-detail-label">Remaining Balance:</span>
-                                <span class="payment-detail-value payment-balance">
-                                    ₱{{ number_format($payment->bill->balance, 2) }}
-                                </span>
-                            </div>
-                            <div class="payment-detail-row">
-                                <span class="payment-detail-label">Status:</span>
-                                <span class="payment-status-badge status-{{ $payment->bill->payment_status }}">
-                                    {{ ucwords(str_replace('_', ' ', $payment->bill->payment_status)) }}
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- View Order Button -->
-                        <a href="{{ route('admin.order.show', $payment->bill->order_id) }}" class="btn-view-order">
-                            <i>👁️</i>
-                            View Order Details
-                        </a>
-                    </div>
-                @endforeach
+            <!-- Desktop Table View -->
+            <div class="sales-table-wrapper">
+                <table class="sales-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Order ID</th>
+                            <th>Amount Paid</th>
+                            <th>Bill Total</th>
+                            <th>Balance</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($payments as $payment)
+                            <tr class="sales-table-row">
+                                <td data-label="Date">
+                                    <div class="table-cell-content">
+                                        <i class="fa-regular fa-clock"></i>
+                                        {{ $payment->created_at->format('M d, Y') }}
+                                        <span class="table-time">{{ $payment->created_at->format('h:i A') }}</span>
+                                    </div>
+                                </td>
+                                <td data-label="Customer">
+                                    <div class="table-customer">
+                                        <div class="table-customer-avatar">
+                                            {{ strtoupper(substr($payment->customer->fname, 0, 1)) }}{{ strtoupper(substr($payment->customer->lname, 0, 1)) }}
+                                        </div>
+                                        <div class="table-customer-info">
+                                            <div class="table-customer-name">
+                                                {{ $payment->customer->fname }} {{ $payment->customer->lname }}
+                                            </div>
+                                            <div class="table-customer-email">
+                                                {{ $payment->customer->email }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-label="Order ID">
+                                    <span class="table-order-id">ORD{{ str_pad($payment->bill->order->id, 2, '0', STR_PAD_LEFT) }}</span>
+                                </td>
+                                <td data-label="Amount Paid">
+                                    <span class="table-amount table-amount-paid">₱{{ number_format($payment->amount, 2) }}</span>
+                                </td>
+                                <td data-label="Bill Total">
+                                    <span class="table-amount">₱{{ number_format($payment->bill->total_amount, 2) }}</span>
+                                </td>
+                                <td data-label="Balance">
+                                    <span class="table-amount table-balance">₱{{ number_format($payment->bill->balance, 2) }}</span>
+                                </td>
+                                <td data-label="Status">
+                                    <span class="table-status-badge status-{{ $payment->bill->payment_status }}">
+                                        {{ ucwords(str_replace('_', ' ', $payment->bill->payment_status)) }}
+                                    </span>
+                                </td>
+                                <td data-label="Actions">
+                                    <div class="table-actions">
+                                        <a href="{{ route('admin.order.show', $payment->bill->order_id) }}" 
+                                           class="btn-table-action btn-view" 
+                                           title="View Order">
+                                            <i class="fa-solid fa-eye"></i>
+                                            <span>View</span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
 
             <!-- Pagination -->

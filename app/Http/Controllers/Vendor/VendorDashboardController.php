@@ -33,7 +33,7 @@ class VendorDashboardController extends Controller
 
         $orders = Order::where('status', '!=', 'completed')  // status not completed
                ->latest()                             // order by created_at descending
-               ->take(2)                              // get only 2 records
+               ->take(4)                              // get only 4 records
                ->get();
 
         return view('vendor.dashboard.dashboard',compact('orders','countOrder','monthlySales','totalCustomer','stock_alert_count'));

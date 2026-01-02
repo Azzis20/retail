@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('vendor.layouts.app')
 
 @section('title', 'Manage Order')
 
@@ -10,7 +10,7 @@
     <h1 class="order-history-title">Order History</h1>
 
     <!-- Search Bar -->
-    <form action="{{ route('admin.order.search',$orders) }}" method="GET" class="search-form">
+    <form action="{{ route('vendor.order.search',$orders) }}" method="GET" class="search-form">
         <div class="search-container">
             <button type="submit" class="search-btn" aria-label="Search">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -28,14 +28,14 @@
     <!-- Filter Tabs -->
      <div class="category-tabs">
         
-        <a href="{{ route('admin.order.index') }}" class="category-tab {{ $status == 'all' ? 'active' : '' }}">All</a>
+        <a href="{{ route('vendor.order.index') }}" class="category-tab {{ $status == 'all' ? 'active' : '' }}">All</a>
         
 
-        <a href="{{ route('admin.order.pending') }}" class="category-tab  {{ $status == 'pending' ? 'active' : '' }}">Pending</a>
+        <a href="{{ route('vendor.order.pending') }}" class="category-tab  {{ $status == 'pending' ? 'active' : '' }}">Pending</a>
 
-        <a href="{{ route('admin.order.ofd') }}" class="category-tab {{ $status == 'Out-for-delivery' ? 'active' : '' }}">Out for Delivery</a>
+        <a href="{{ route('vendor.order.ofd') }}" class="category-tab {{ $status == 'Out-for-delivery' ? 'active' : '' }}">Out for Delivery</a>
 
-        <a href="{{ route('admin.order.completed') }}" class="category-tab  {{ $status == 'completed' ? 'active' : '' }}">Completed</a>
+        <a href="{{ route('vendor.order.completed') }}" class="category-tab  {{ $status == 'completed' ? 'active' : '' }}">Completed</a>
 
     </div>
     
@@ -47,13 +47,13 @@
                 <i class="fa-solid fa-box-open"></i>
                 <p>No orders found</p>
                 @if(request('search'))
-                <a href="{{ route('admin.order.index') }}" class="btn-clear-search">Clear Search</a>
+                <a href="{{ route('vendor.order.index') }}" class="btn-clear-search">Clear Search</a>
                 @endif
         </div>
     @else
         @foreach($orders as $order)
             <div class="order-card" data-status="{{ strtolower($order->status) }}">
-                <a href="{{ route('admin.order.show',$order->id) }}">
+                <a href="{{ route('vendor.order.show',$order->id) }}">
                     <div class="order-card-header">
 
                         <div class="order-date">

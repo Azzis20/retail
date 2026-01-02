@@ -26,47 +26,30 @@
         </div>
     </form>
 
-    <!-- Stock Status Filter Dropdown -->
-    <div class="stock-filter-container">
-        <form action="{{ route('admin.product.filter-stock') }}" method="GET" class="stock-filter-form">
-            <label for="stockStatusFilter" class="stock-filter-label">
-                <i class="fa-solid fa-filter"></i>
-                Filter by Stock:
-            </label>
-            <select 
-                name="stock_status" 
-                id="stockStatusFilter" 
-                class="stock-filter-select"
-                onchange="this.form.submit()"
-            >
-                <option value="all" {{ ($stockStatus ?? 'all') === 'all' ? 'selected' : '' }}>
-                    All Products
-                </option>
-                <option value="available" {{ ($stockStatus ?? '') === 'available' ? 'selected' : '' }}>
-                    Available
-                </option>
-                <option value="low-stock" {{ ($stockStatus ?? '') === 'low-stock' ? 'selected' : '' }}>
-                    Low Stock
-                </option>
-                <option value="out-of-stock" {{ ($stockStatus ?? '') === 'out-of-stock' ? 'selected' : '' }}>
-                    Out of Stock
-                </option>
-            </select>
-        </form>
-    </div>
-
     <!-- Add Product Button -->
     <a href="{{ route('admin.product.create') }}" class="btn-add-product">
         <i class="fa-solid fa-plus"></i>
         <span>Add Product</span>
     </a>    
 
-    <!-- Category Tabs -->
+  
     <div class="category-tabs">
+        
         <a href="{{ route('admin.product.index') }}" class="category-tab {{ $category == 'all' ? 'active' : '' }}">All</a>
-        <a href="{{ route('admin.product.vegetable') }}" class="category-tab {{ $category == 'vegetable' ? 'active' : '' }}">Vegetable</a>
-        <a href="{{ route('admin.product.grocery') }}" class="category-tab {{ $category == 'grocery' ? 'active' : '' }}">Grocery</a>
+        
+
+        <a href="{{ route('admin.product.vegetable') }}" class="category-tab  {{ $category == 'vegetable' ? 'active' : '' }}">Vegetable</a>
+
+         <a href="{{ route('admin.product.grocery') }}" class="category-tab  {{ $category == 'grocery' ? 'active' : '' }}">Grocery</a>
+
+        
+        
     </div>
+
+
+
+
+
 
     <!-- Product List Section -->
     <h2 class="product-list-title">Product List</h2>
@@ -77,25 +60,28 @@
         
         <div class="product-card" data-category="{{ strtolower($product->category ?? 'all') }}">
             <div class="product-main">
-                @if ($product->image)
-                    <img 
-                        src="{{ $product->image }}" 
-                        alt="{{ $product->product_name }}" 
-                        class="product-image"
-                    >
-                @else
-                    <div class="no-picture-container">
-                        No Picture
-                    </div>
-                @endif  
-                
+                    @if ($product->image)
+                        <img 
+                            src="{{ $product->image }}" 
+                            alt="{{ $product->product_name }}" 
+                            class="product-image"
+                        >
+                    @else
+                        <div class="no-picture-container">
+                            No Picture
+                        </div>
+                    @endif  
+
+                    
                 <div class="product-details">
                     <h3 class="product-name">{{ $product->product_name }}</h3>
                     <p class="product-price">₱{{ number_format($product->price, 2) }}</p>
                     
                     <span class="availability-badge {{ $product->getStockStatus() }}">
-                        {{ ucfirst(str_replace('-', ' ', $product->getStockStatus())) }}
+                    {{ $product->getStockStatus() }}
                     </span>
+                                    
+                    
                 </div>
             </div>
             <a href="{{ route('admin.product.edit', $product->id) }}" class="btn-make-changes">
@@ -109,21 +95,45 @@
             <div class="no-products-message">
                 <i class="fa-solid fa-box-open"></i>
                 <p>No products found</p>
-                @if(request('search') || request('stock_status'))
-                <a href="{{ route('admin.product.index') }}" class="btn-clear-search">Clear Filters</a>
+                @if(request('search'))
+                <a href="{{ route('admin.product.index') }}" class="btn-clear-search">Clear Search</a>
                 @endif
             </div>
         
         @endforelse
 
     </div>  
-    
-    <!-- Paginator -->
+     <!-- Paginator -->
     @if($products->hasPages())
     <div class="pagination-wrapper">
         {{ $products->appends(request()->query())->links() }}
     </div>
     @endif
+    
+   
+
+<script>
+    // Category filter functionality
+    document.querySelectorAll('.category-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Update active tab
+            document.querySelectorAll('.category-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            const category = this.dataset.category;
+            const products = document.querySelectorAll('.product-card');
+            
+            products.forEach(product => {
+                if (category === 'all') {
+                    product.style.display = 'block';
+                } else {
+                    const productCategory = product.dataset.category;
+                    product.style.display = productCategory === category ? 'block' : 'none';
+                }
+            });
+        });
+    });
+</script>
 
 @endsection
 
@@ -138,15 +148,18 @@
     color: white;
   }
 
+  /* Available (Green) */
   .availability-badge.available {
-    background-color: #28a745;
+    background-color: #28a745; /* Green */
   }
 
+  /* Low Stock (Yellow) */
   .availability-badge.low-stock {
-    background-color: #ffc107;
+    background-color: #ffc107; /* Yellow */
   }
 
+  /* Out of Stock (Red) */
   .availability-badge.out-of-stock {
-    background-color: #dc3545;
+    background-color: #dc3545; /* Red */
   }
 </style>

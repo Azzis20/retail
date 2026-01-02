@@ -8,6 +8,7 @@ use App\Models\Bill;
 use App\Models\Order;
 use App\Models\Payment;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 
 
@@ -48,13 +49,27 @@ class BillController extends Controller
             return $payment;
         });
     })->sortByDesc('created_at');
+        $perPage = 5;
+        $page = request()->get('page', 1);
+
+        // Slice the collection
+        $paginatedPayments = new LengthAwarePaginator(
+            $allPayments->forPage($page, $perPage),
+            $allPayments->count(),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
 
 
 
 
-        return view('customer.bill.bill-index',compact('bills','totalBalance','totalAmount','totalOrders','totalPaid','allPayments'));
+        return view('customer.bill.bill-index',compact('bills','totalBalance','totalAmount','totalOrders','totalPaid','allPayments','paginatedPayments'));
 
     }
+
+
+
     /**
      * Show specific bill details
      */

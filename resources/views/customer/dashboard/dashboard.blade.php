@@ -94,11 +94,11 @@
             </a>
             @endforeach
         @endif  
-        </div>
+        <!-- </div>
             <div class="orders-header">
             <h2 class="section-title">Order Completed</h2>
             <a href="{{ route('customer.order.index') }}" class="view-all-link">View All</a>
-        </div>
+        </div> -->
 
 </div>
     

@@ -135,13 +135,14 @@
 
     <!-- Action Buttons -->
     <div class="action-button-container">
-        <form action="{{ route('admin.orders.deliveried', $order->id) }}" method="POST">
+        <form action="{{ route('admin.orders.deliveried', $order->id) }}" method="POST" id="deliveryForm">
             @csrf
             @method('PATCH')
 
-            <button type="submit" 
-                    class="btn-ready-pickup 
-                    {{ in_array($order->status, ['completed', 'out-for-delivery']) ? 'btn-disabled' : '' }}"
+            <button type="button" 
+                    class="btn-ready-pickup {{ in_array($order->status, ['completed', 'out-for-delivery']) ? 'btn-disabled' : '' }}"
+                    id="deliveryBtn"
+                    @if(!in_array($order->status, ['completed', 'out-for-delivery'])) onclick="showDeliveryConfirmation()" @endif
                     @if(in_array($order->status, ['completed', 'out-for-delivery'])) disabled @endif>
                 <i class="fa-solid fa-truck"></i>
                 Mark as Out for Delivery
@@ -153,7 +154,7 @@
     <div class="action-button-container">
         <a href="{{ route('admin.order.payment', $order->id) }}" 
            class="btn-record-payment {{ $order->bill->payment_status === 'paid' ? 'btn-disabled' : '' }}"
-           @if($order->bill->payment_status === 'paid') onclick="return false;" @endif>
+           id="paymentBtn">
             <i class="fa-solid fa-wallet"></i>
             Record Payment
         </a>
@@ -161,41 +162,106 @@
 
 </div>
 
-<script>
-    // Optional: Auto-save notes functionality
-    const notesTextarea = document.querySelector('.notes-textarea');
-    let saveTimeout;
+<!-- Delivery Confirmation Modal -->
+<div class="delivery-modal-overlay" id="deliveryModal">
+    <div class="delivery-modal-content">
+        <div class="delivery-modal-icon">
+            <i class="fa-solid fa-truck-fast"></i>
+        </div>
+        
+        <h3 class="delivery-modal-title">Mark Order for Delivery?</h3>
+        
+        <p class="delivery-modal-message">
+            This order will be marked as "Out for Delivery". The customer will be notified that their order is on the way.
+        </p>
+        
+        <div class="delivery-modal-actions">
+            <button type="button" class="btn-delivery-cancel" onclick="hideDeliveryConfirmation()">
+                <i class="fa-solid fa-times"></i>
+                Cancel
+            </button>
+            <button type="button" class="btn-delivery-confirm" onclick="confirmDelivery()">
+                <i class="fa-solid fa-check"></i>
+                Confirm
+            </button>
+        </div>
+    </div>
+</div>
 
-    if (notesTextarea && !notesTextarea.hasAttribute('readonly')) {
-        notesTextarea.addEventListener('input', function() {
-            clearTimeout(saveTimeout);
-            
-            saveTimeout = setTimeout(() => {
-                // Auto-save notes after 1 second of no typing
-                console.log('Auto-saving notes:', this.value);
-                // You can add AJAX call here to save notes
-            }, 1000);
-        });
+<script>
+    // Show delivery confirmation modal
+    function showDeliveryConfirmation() {
+        const modal = document.getElementById('deliveryModal');
+        if (modal) {
+            modal.classList.add('active');
+            console.log('Modal shown'); // Debug log
+        } else {
+            console.error('Modal not found'); // Debug log
+        }
     }
 
-    // Button click handler
-    document.querySelector('.btn-ready-pickup')?.addEventListener('click', function(e) {
-        if (!this.closest('form')) {
-            e.preventDefault();
-            
-            // Confirm action
-            if (confirm('Mark this order as out for delivery?')) {
-                console.log('Order marked as out for delivery');
-            }
+    // Hide delivery confirmation modal
+    function hideDeliveryConfirmation() {
+        const modal = document.getElementById('deliveryModal');
+        if (modal) {
+            modal.classList.remove('active');
+            console.log('Modal hidden'); // Debug log
         }
-    });
+    }
 
-    // Record payment button handler
-    document.querySelector('.btn-record-payment')?.addEventListener('click', function(e) {
-        if (this.classList.contains('btn-disabled')) {
-            e.preventDefault();
-            alert('This order has been fully paid. No additional payments needed.');
+    // Confirm and submit delivery form
+    function confirmDelivery() {
+        const form = document.getElementById('deliveryForm');
+        if (form) {
+            console.log('Submitting form'); // Debug log
+            form.submit();
+        } else {
+            console.error('Form not found'); // Debug log
         }
+    }
+
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // Close modal when clicking outside
+        const modal = document.getElementById('deliveryModal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideDeliveryConfirmation();
+                }
+            });
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                hideDeliveryConfirmation();
+            }
+        });
+
+        // Record payment button handler
+        const paymentBtn = document.getElementById('paymentBtn');
+        if (paymentBtn && paymentBtn.classList.contains('btn-disabled')) {
+            paymentBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('This order has been fully paid. No additional payments needed.');
+            });
+        }
+
+        // Optional: Auto-save notes functionality
+        const notesTextarea = document.querySelector('.notes-textarea');
+        if (notesTextarea && !notesTextarea.hasAttribute('readonly')) {
+            let saveTimeout;
+            notesTextarea.addEventListener('input', function() {
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(() => {
+                    console.log('Auto-saving notes:', this.value);
+                    // You can add AJAX call here to save notes
+                }, 1000);
+            });
+        }
+
     });
 </script>
 

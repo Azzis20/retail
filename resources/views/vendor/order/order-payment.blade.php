@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('vendor.layouts.app')
 
 @section('title', 'Record Payment')
 
@@ -10,7 +10,7 @@
     
     <!-- Header with Back Button -->
     <div class="form-header">
-        <a href="{{ route('admin.order.show', $order->id) }}" class="back-button">
+        <a href="{{ route('vendor.order.show', $order->id) }}" class="back-button">
             <i class="fa-solid fa-chevron-left"></i>
         </a>
         <h1>Record Payment</h1>
@@ -88,7 +88,7 @@
     <section class="payment-section">
         <h2 class="section-heading">Record New Payment</h2>
         
-        <form action="{{ route('admin.payment.store') }}" method="POST" class="payment-form">
+        <form action="{{ route('vendor.payment.store') }}" method="POST" class="payment-form">
             @csrf
             
             <input type="hidden" name="bill_id" value="{{ $order->bill->id }}">
@@ -164,7 +164,7 @@
 
             <!-- Form Actions -->
             <div class="form-actions">
-                <a href="{{ route('admin.order.show', $order->id) }}" class="btn-cancel">
+                <a href="{{ route('vendor.order.show', $order->id) }}" class="btn-cancel">
                     <i class="fa-solid fa-times"></i>
                     Cancel
                 </a>

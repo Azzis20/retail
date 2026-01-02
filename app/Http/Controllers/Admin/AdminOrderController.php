@@ -8,7 +8,9 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\Payment;
-use Illuminate\Support\Facades\DB; 
+use App\Services\NotificationService; 
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log; 
 
 class AdminOrderController extends Controller
 {
@@ -17,7 +19,6 @@ class AdminOrderController extends Controller
      */
     public function index()
     {
-
         $orders = Order::latest()
                ->with(['customer', 'processedBy', 'bill']) 
                ->paginate(6);
@@ -25,8 +26,6 @@ class AdminOrderController extends Controller
         return view('admin.order.order-index', compact('orders'))->with('status','all');
     }
 
-
-    
     public function selectCompleted()
     {
         $orders = Order::where('status', 'completed')
@@ -35,43 +34,31 @@ class AdminOrderController extends Controller
         return view('admin.order.order-index', compact('orders'))->with('status', 'completed');
     }
 
-
-
-
-       public function selectOutForDelivery()
+    public function selectOutForDelivery()
     {
-        $orders = Order::where('status', 'Out-for-delivery') //out for delivery
+        $orders = Order::where('status', 'Out-for-delivery')
             ->paginate(5);
 
         return view('admin.order.order-index', compact('orders'))->with('status', 'Out-for-delivery');
     }
     
-       public function selectPending() //pending
+    public function selectPending()
     {
         $orders = Order::where('status', 'pending')
             ->paginate(5);
 
         return view('admin.order.order-index', compact('orders'))->with('status', 'pending');
     }
-    
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        
         return view('admin.manage.staff-create');
     }
- 
 
-
-
-    public function search(Request $request){
-
-
-         $search = $request->input('search');
-         $orders = Order::query()
+    public function search(Request $request)
+    {
+        $search = $request->input('search');
+        $orders = Order::query()
             ->with('customer')
             ->when($search, function ($query) use ($search) {
                 $query->whereHas('customer', function ($subQuery) use ($search) {
@@ -82,45 +69,39 @@ class AdminOrderController extends Controller
             ->paginate(5)
             ->appends(['search' => $search]);
 
-
         return view('admin.order.order-index', compact('orders'))->with('status','search');
     }
 
     public function outForDelivery(Request $request, $id)
     {
-    // 1. Find the order by ID
-    $order = Order::findOrFail($id);
-
-    
+        // Find the order by ID
+        $order = Order::findOrFail($id);
+        
+        // Store old status for notification
+        $oldStatus = $order->status;
+        
+        // Update order status
         $order->update([
-        'status'       => 'out-for-delivery',
-        'processed_by' => auth()->id(),
-        'updated_at' => now(), 
-    ]);
+            'status'       => 'out-for-delivery',
+            'processed_by' => auth()->id(),
+            'updated_at' => now(), 
+        ]);
 
-    // 3. Redirect back with a success message
-    return redirect()->route('admin.order.index')->with('success', 'Order is now out for delivery!');
-}
+        // CREATE NOTIFICATION - Status changed
+        NotificationService::createOrderStatusNotification($order, $oldStatus, 'out-for-delivery');
 
+        // Redirect back with a success message
+        return redirect()->route('admin.order.index')
+            ->with('success', 'Order is now out for delivery!');
+    }
 
-    
-
-
-    
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        // If you implement order creation in admin panel, add notification here
+        // NotificationService::createOrderNotification($order);
     }
-    
 
-    /**
-     * Display the specified resource.
-     */
-        public function show(string $id)
+    public function show(string $id)
     {
         // Fetch the order with customer and processor relationships
         $order = Order::with(['customer', 'processedBy'])->findOrFail($id);
@@ -129,7 +110,7 @@ class AdminOrderController extends Controller
         return view('admin.order.order-show', compact('order'));
     }
 
-        public function recordPayment(string $id)
+    public function recordPayment(string $id)
     {
         $order = Order::with([
             'customer', 
@@ -140,8 +121,7 @@ class AdminOrderController extends Controller
         return view('admin.order.order-payment', compact('order'));
     }
 
-
-   public function paymentStore(Request $request)
+    public function paymentStore(Request $request)
     {
         // Validate the request
         $validated = $request->validate([
@@ -168,15 +148,24 @@ class AdminOrderController extends Controller
                 'bill_id' => $validated['bill_id'],
                 'customer_id' => $validated['customer_id'],
                 'amount' => $validated['amount'],
-                'recorded_by' => auth()->id(), // This will be set automatically by the model boot method too
+                'recorded_by' => auth()->id(),
             ]);
+
+            // CREATE NOTIFICATION - Payment recorded
+            NotificationService::createPaymentNotification($payment);
 
             // Check if order should be marked as completed
             $order = Order::findOrFail($validated['order_id']);
             
+            // Store old status before potential change
+            $oldStatus = $order->status;
+            
             // If bill is fully paid and order is out for delivery, mark as completed
             if ($bill->fresh()->payment_status === 'paid' && $order->status === 'out-for-delivery') {
                 $order->update(['status' => 'completed']);
+                
+                // CREATE NOTIFICATION - Order completed
+                NotificationService::createOrderStatusNotification($order, $oldStatus, 'completed');
             }
 
             DB::commit();
@@ -192,9 +181,4 @@ class AdminOrderController extends Controller
                 ->withInput();
         }
     }
-
-    
-
-
-    
 }

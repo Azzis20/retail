@@ -11,6 +11,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\NotificationService;
 
 class ProductController extends Controller
 {
@@ -180,6 +181,10 @@ class ProductController extends Controller
             'total_amount' => $totalAmount,
             'balance' => $totalAmount
         ]);
+
+        
+
+        NotificationService::createOrderNotification($order);
 
         // Clear cart
         Cart::where('customer_id', Auth::id())->delete();

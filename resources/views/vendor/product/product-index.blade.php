@@ -1,4 +1,4 @@
-@extends('admin.layouts.app')
+@extends('vendor.layouts.app')
 
 @section('title', 'Inventory Management')
 
@@ -11,7 +11,7 @@
     </div>
 
     <!-- Search Bar -->
-    <form action="{{ route('admin.product.search') }}" method="GET" class="search-form">
+    <form action="{{ route('vendor.product.search') }}" method="GET" class="search-form">
         <div class="search-container">
             <button type="submit" class="search-btn" aria-label="Search">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -28,7 +28,7 @@
 
     <!-- Stock Status Filter Dropdown -->
     <div class="stock-filter-container">
-        <form action="{{ route('admin.product.filter-stock') }}" method="GET" class="stock-filter-form">
+        <form action="{{ route('vendor.product.filter-stock') }}" method="GET" class="stock-filter-form">
             <label for="stockStatusFilter" class="stock-filter-label">
                 <i class="fa-solid fa-filter"></i>
                 Filter by Stock:
@@ -56,16 +56,16 @@
     </div>
 
     <!-- Add Product Button -->
-    <a href="{{ route('admin.product.create') }}" class="btn-add-product">
+    <a href="{{ route('vendor.product.create') }}" class="btn-add-product">
         <i class="fa-solid fa-plus"></i>
         <span>Add Product</span>
     </a>    
 
     <!-- Category Tabs -->
     <div class="category-tabs">
-        <a href="{{ route('admin.product.index') }}" class="category-tab {{ $category == 'all' ? 'active' : '' }}">All</a>
-        <a href="{{ route('admin.product.vegetable') }}" class="category-tab {{ $category == 'vegetable' ? 'active' : '' }}">Vegetable</a>
-        <a href="{{ route('admin.product.grocery') }}" class="category-tab {{ $category == 'grocery' ? 'active' : '' }}">Grocery</a>
+        <a href="{{ route('vendor.product.index') }}" class="category-tab {{ $category == 'all' ? 'active' : '' }}">All</a>
+        <a href="{{ route('vendor.product.vegetable') }}" class="category-tab {{ $category == 'vegetable' ? 'active' : '' }}">Vegetable</a>
+        <a href="{{ route('vendor.product.grocery') }}" class="category-tab {{ $category == 'grocery' ? 'active' : '' }}">Grocery</a>
     </div>
 
     <!-- Product List Section -->
@@ -98,7 +98,7 @@
                     </span>
                 </div>
             </div>
-            <a href="{{ route('admin.product.edit', $product->id) }}" class="btn-make-changes">
+            <a href="{{ route('vendor.product.edit', $product->id) }}" class="btn-make-changes">
                 <i class="fa-solid fa-pen-to-square"></i>
                 Make Changes
             </a>
@@ -110,7 +110,7 @@
                 <i class="fa-solid fa-box-open"></i>
                 <p>No products found</p>
                 @if(request('search') || request('stock_status'))
-                <a href="{{ route('admin.product.index') }}" class="btn-clear-search">Clear Filters</a>
+                <a href="{{ route('vendor.product.index') }}" class="btn-clear-search">Clear Filters</a>
                 @endif
             </div>
         
