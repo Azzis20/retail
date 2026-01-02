@@ -13,11 +13,8 @@
         <a href="{{ route('admin.order.index') }}" class="back-button">
             <i class="fa-solid fa-chevron-left"></i>
         </a>
-        <h1>Order Processing</h1>
+        <h1>Order Details</h1>
     </div>
-
-
-
 
     <!-- Order Details Section -->
     <section class="order-section">
@@ -31,7 +28,7 @@
             
             <div class="info-row">
                 <span class="info-label">Order ID:</span>
-                <span class="info-value">{{ $order->id }}</span>
+                <span class="info-value">ORD{{ str_pad($order->id, 2, '0', STR_PAD_LEFT) }}</span>
             </div>
             
             <div class="info-row">
@@ -41,7 +38,69 @@
             
             <div class="info-row">
                 <span class="info-label">Address:</span>
-                <span class="info-value">{{ $order->customer->address ?? N/A}}</span>
+                <span class="info-value">{{ $order->customer->address ?? 'N/A'}}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Status:</span>
+                <span class="order-status-badge 
+                    @if($order->status == 'pending') pending-badge
+                    @elseif($order->status == 'out-for-delivery') delivery-badge
+                    @elseif($order->status == 'completed') completed-badge
+                    @elseif($order->status == 'cancelled') cancelled-badge
+                    @endif">
+                    @if($order->status == 'pending') Pending
+                    @elseif($order->status == 'out-for-delivery') Out for Delivery
+                    @elseif($order->status == 'completed') Completed
+                    @elseif($order->status == 'cancelled') Cancelled
+                    @endif
+                </span>
+            </div>
+            @if($order->processed_by)
+                <div class="info-row">
+                    <span class="info-label">Processed By</span>
+                    <span class="info-value">{{ $order->processedBy->fname }} {{ $order->processedBy->lname }}</span>
+                </div>
+            @endif
+        </div>
+    </section>
+
+    <!-- Invoice Bill Section -->
+    <section class="order-section">
+        <h2 class="section-heading">Invoice Bill</h2>
+        
+        <div class="info-card items-card">
+            <div class="info-row">
+                <span class="info-label">Invoice ID:</span>
+                <span class="info-value">INV{{ str_pad($order->id, 2, '0', STR_PAD_LEFT) }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Total:</span>
+                <span class="info-value">₱{{ number_format($order->bill->total_amount ?? 0, 2) }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Paid Amount:</span>
+                <span class="info-value">₱{{ number_format($order->bill?->payments->sum('amount') ?? 0, 2) }}</span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Balance:</span>
+                <span class="info-value" style="color: {{ $order->bill->balance > 0 ? '#e74c3c' : '#00c896' }}; font-weight: 700;">
+                    ₱{{ number_format($order->bill->balance ?? 0, 2) }}
+                </span>
+            </div>
+            
+            <div class="info-row">
+                <span class="info-label">Payment Status:</span>
+                <span class="order-status-badge 
+                    @if($order->bill->payment_status == 'paid') completed-badge
+                    @elseif($order->bill->payment_status == 'unpaid') pending-badge
+                    @elseif($order->bill->payment_status == 'partially_paid') delivery-badge
+                    @endif">
+                    {{ ucwords(str_replace('_', ' ', $order->bill->payment_status)) }}
+                </span>
             </div>
         </div>
     </section>
@@ -51,17 +110,12 @@
         <h2 class="section-heading">Items</h2>
         
         <div class="info-card items-card">
-
-
-          
-            @foreach($order->items as $item)
+            @foreach($order->orderItems as $item)
                 <div class="item-row">
-                    <span class="item-name">{{ $item->product->product_name ?? N/A}}</span>
-                    <span class="item-quantity">{{ $item->quantity . ' ' . $item->product->unit ?? N/A}}</span>
+                    <span class="item-name">{{ $item->product->product_name ?? 'N/A'}}</span>
+                    <span class="item-quantity">{{ $item->quantity . ' ' . $item->product->unit ?? 'N/A'}}</span>
                 </div>
             @endforeach
-
-
         </div>
     </section>
 
@@ -74,26 +128,45 @@
                 class="notes-textarea" 
                 placeholder="Add notes about this order..."
                 rows="5"
-            > {{$order->notes ?? N/A }}</textarea>
+                readonly
+            >{{ $order->notes ?? 'N/A' }}</textarea>
         </div>
     </section>
 
-    <!-- Action Button -->
+    <!-- Action Buttons -->
     <div class="action-button-container">
-        <button class="btn-ready-pickup">
-            Mark as Ready for Pick up
-        </button>
+        <form action="{{ route('admin.orders.deliveried', $order->id) }}" method="POST">
+            @csrf
+            @method('PATCH')
+
+            <button type="submit" 
+                    class="btn-ready-pickup 
+                    {{ in_array($order->status, ['completed', 'out-for-delivery']) ? 'btn-disabled' : '' }}"
+                    @if(in_array($order->status, ['completed', 'out-for-delivery'])) disabled @endif>
+                <i class="fa-solid fa-truck"></i>
+                Mark as Out for Delivery
+            </button>
+        </form>
+    </div>
+
+    <!-- Record Payment Button -->
+    <div class="action-button-container">
+        <a href="{{ route('admin.order.payment', $order->id) }}" 
+           class="btn-record-payment {{ $order->bill->payment_status === 'paid' ? 'btn-disabled' : '' }}"
+           @if($order->bill->payment_status === 'paid') onclick="return false;" @endif>
+            <i class="fa-solid fa-wallet"></i>
+            Record Payment
+        </a>
     </div>
 
 </div>
-
 
 <script>
     // Optional: Auto-save notes functionality
     const notesTextarea = document.querySelector('.notes-textarea');
     let saveTimeout;
 
-    if (notesTextarea) {
+    if (notesTextarea && !notesTextarea.hasAttribute('readonly')) {
         notesTextarea.addEventListener('input', function() {
             clearTimeout(saveTimeout);
             
@@ -111,11 +184,17 @@
             e.preventDefault();
             
             // Confirm action
-            if (confirm('Mark this order as ready for pick up?')) {
-                // Add your logic here
-                console.log('Order marked as ready for pick up');
-                // You can add AJAX call or form submission here
+            if (confirm('Mark this order as out for delivery?')) {
+                console.log('Order marked as out for delivery');
             }
+        }
+    });
+
+    // Record payment button handler
+    document.querySelector('.btn-record-payment')?.addEventListener('click', function(e) {
+        if (this.classList.contains('btn-disabled')) {
+            e.preventDefault();
+            alert('This order has been fully paid. No additional payments needed.');
         }
     });
 </script>

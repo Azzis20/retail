@@ -24,7 +24,7 @@ class OrderSeeder extends Seeder
         Order::create([
             'customer_id' => 3,
             'processed_by' => 1,
-            'status' => 'processing',
+            'status' => 'pending',
             'notes' => 'Order is being prepared.'
         ]);
 
@@ -38,14 +38,14 @@ class OrderSeeder extends Seeder
         Order::create([
             'customer_id' => 3,
             'processed_by' => 2,
-            'status' => 'completed',
+            'status' => 'pending',
             'notes' => 'Delivered to customer.'
         ]);
 
         Order::create([
             'customer_id' => 3  ,
             'processed_by' => null,
-            'status' => 'cancelled',
+            'status' => 'pending',
             'notes' => 'Customer requested cancellation.'
         ]);
     }

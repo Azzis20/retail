@@ -30,15 +30,48 @@
             </div>
         </a>
         
-        <a href="{{ route('admin.order.index') }}" class="stat-card-link"> 
+        <a href="{{ route('admin.product.index') }}" class="stat-card-link"> 
             <div class="stat-card">  
                 <div class="stat-content">
                     <div class="stat-icon">
-                        <i class="fa-solid fa-ellipsis"></i>
+                        <i class="fa-solid fa-boxes-stacked"></i>
                     </div>
                     <div class="stat-info">
-                        <p class="stat-label">Pending</p>
-                        <h3 class="stat-value">{{$pendingCount}}</h3>
+                        <p class="stat-label">Inventory Alert</p>
+                        <h3 class="stat-value">{{$stock_alert_count}}</h3>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+    </div>
+    
+        <div class="stats-container"> 
+
+        <!-- Fixed: Removed action-card class wrapper, using stat-card-link instead -->
+        <a href="{{ route('admin.sales.index') }}" class="stat-card-link">
+            <div class="stat-card">  
+                <div class="stat-content">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Montly Sales</p>
+                        <h3 class="stat-value">{{$monthlySales}}</h3>
+                    </div>
+                </div>
+            </div>
+        </a>
+        
+        <a href="{{ route('admin.customer.index') }}" class="stat-card-link"> 
+            <div class="stat-card">  
+                <div class="stat-content">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-user"></i>    
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Client</p>
+                        <h3 class="stat-value">{{$totalCustomer}}</h3>
                     </div>
                 </div>
             </div>
@@ -46,19 +79,9 @@
 
     </div>
 
-    <h2 class="section-title">Quick Actions</h2>
+    
 
-    <div class="actions-container">
-        <a href="{{ route('admin.add.staff') }}" class="action-card">
-            <i class="fa-solid fa-user-plus"></i>
-            <span>Add Staff</span>
-        </a>
-        
-        <a href="{{ route('admin.product.create') }}" class="action-card">
-            <i class="fa-solid fa-circle-plus"></i>
-            <span>Add Product</span>
-        </a>
-    </div>
+ 
 
     
     <div class="orders-header">
@@ -67,6 +90,16 @@
     </div>
 
     <div class="orders-container">
+     @if ($orders->isEmpty())
+        <div class="no-products-message">
+                <i class="fa-solid fa-box-open"></i>
+                <p>No orders found</p>
+                @if(request('search'))
+                <a href="{{ route('admin.order.index') }}" class="btn-clear-search">Clear Search</a>
+                @endif
+        </div>
+    @else
+
 
         @foreach($orders as $order) 
 
@@ -82,11 +115,24 @@
                     </div>
                 </div>
                
-                <span class="status-badge status-pending">{{$order->status}}</span>
+                <span class="order-status-badge 
+                            @if($order->status == 'pending') pending-badge
+                            @elseif($order->status == 'confirmed') confirmed-badge
+                            @elseif($order->status == 'out-for-delivery') delivery-badge
+                            @elseif($order->status == 'completed') completed-badge
+                            @elseif($order->status == 'cancelled') cancelled-badge
+                            @endif">
+                            @if($order->status == 'pending') Pending
+                            @elseif($order->status == 'out-for-delivery') Out for Delivery
+                            @elseif($order->status == 'completed') Completed
+                            @elseif($order->status == 'cancelled') Cancelled
+                            @endif
+                </span>
                 
             </div>
         </a>
         @endforeach
+    @endif  
 
     </div>
 

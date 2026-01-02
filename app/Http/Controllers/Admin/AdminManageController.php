@@ -88,13 +88,14 @@ class AdminManageController extends Controller
         $search = $request->input('search');
 
         $staffs = User::query()
-                ->when($search, function ($query) use ($search) {
-                    $query->where('fname', 'LIKE', "%{$search}%")
-                        ->orWhere('lname', 'LIKE', "%{$search}%");
-                     
-                   
-            })
-            ->paginate(5);
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('fname', 'LIKE', "%{$search}%")
+                ->orWhere('lname', 'LIKE', "%{$search}%");
+            });
+        })
+        ->where('role', 'vendor') 
+        ->paginate(6);
         return view('admin.manage.staff-index', compact('staffs'))->with('search');
     }
     

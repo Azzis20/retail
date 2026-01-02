@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('customer_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('processed_by')->nullable()->constrained('users')->onDelete('cascade');
             $table->string('status'); //pending confirmed out-for-delivery
-            $table->text('notes');
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

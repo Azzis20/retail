@@ -15,29 +15,46 @@ class OrderItem extends Model
         'product_id',
         'quantity',
         'unit_price',
-        // 'line_total', // optional if you compute it dynamically
+        'line_total',  // ← ADD THIS
+        'is_proceseed',
+
+ 
     ];
      protected $casts = [
-        'is_processed' => 'boolean',
-        // other casts...
+         'is_proceseed' => 'boolean',
+        'unit_price' => 'decimal:2',
+        'line_total' => 'decimal:2',
     ];
 
 
     // Accessor for dynamic line_total
-    public function getLineTotalAttribute()
+    public function getLineTotalAttribute($value)
     {
-        return $this->quantity * $this->unit_price;
+        // If line_total is stored, use it; otherwise calculate
+        return $value ?? ($this->quantity * $this->unit_price);
     }
 
     // Relationships
-    public function order():BelongsTo
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function product():BelongsTo
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+  
+
+    protected static function booted()
+    {
+        static::creating(function ($item) {
+            $item->line_total = $item->quantity * $item->unit_price;
+        });
+
+        static::updating(function ($item) {
+            $item->line_total = $item->quantity * $item->unit_price;
+        });
     }
 
 }

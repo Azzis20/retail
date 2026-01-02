@@ -12,9 +12,9 @@
 <div class="auth-container">
     <div class="logo-section">
         <div class="logo-circle">
-            <i class="fas fa-apple-alt"></i>
+            <i class="fa-solid fa-basket-shopping"></i>
         </div>
-        <div class="logo-text">SukiOrder</div>
+        <div class="logo-text">Haris Store</div>
     </div>
 
     <h1 class="page-title">Create<br>Your Account</h1>
@@ -120,7 +120,8 @@
                     required 
                     placeholder="Enter your contact number"
                     value="{{ old('contact') }}"
-                >
+                    maxlength="11" <!-- limit input to 11 characters -->
+                
             </div>
             @error('contact')
                 <span class="error-message">{{ $message }}</span>
@@ -144,28 +145,12 @@
                 <span class="error-message">{{ $message }}</span>
             @enderror
         </div>
-<!-- 
-        {{-- Since you are restricting role to vendor/customer, you should add the role selection field here --}}
-        {{-- I'm assuming you will add this based on your validation: ['role' => ['required', 'in:vendor,customer']] --}}
-        <div class="form-group">
-            <label for="role">Register as</label>
-            <div class="input-wrapper">
-                <i class="fas fa-user-tag"></i>
-                <select id="role" name="role" required>
-                    <option value="">Select Role</option>
-                    <option value="customer" {{ old('role') == 'customer' ? 'selected' : '' }}>Customer</option>
-                    <option value="vendor" {{ old('role') == 'vendor' ? 'selected' : '' }}>Vendor</option>
-                </select>
-            </div>
-            @error('role')
-                <span class="error-message">{{ $message }}</span>
-            @enderror
-        </div> -->
+
 
         <button type="submit" class="btn btn-primary">Register</button>
     </form>
 
-    <a href="{{ route('login') }}" class="back-to-login">
+    <a href="{{ route('login.page') }}" class="back-to-login">
         <span class="back-icon">
             <i class="fas fa-arrow-left"></i>
         </span>

@@ -1,0 +1,49 @@
+ <!-- Bill Summary Section -->
+    <div class="bill-summary-section">
+        <h2 class="section-title">Bill Summary</h2>
+        
+        @if($bills->isEmpty())
+            <div class="no-bills-card">
+                <i>📋</i>
+                <p>No bills found</p>
+                <span class="no-bills-text">You don't have any bills yet</span>
+            </div>
+        @else
+            @foreach($bills as $bill)
+            <div class="bill-card">
+                <div class="bill-card-header">
+                    <div class="bill-order-info">
+                        <span class="bill-label">Order #{{ $bill->order_id }}</span>
+                        <span class="bill-date">{{ $bill->created_at->format('M d, Y') }}</span>
+                    </div>
+                    <div class="bill-status">
+                        @if($bill->balance <= 0)
+                            <span class="status-paid">Paid</span>
+                        @else
+                            <span class="status-unpaid">Unpaid</span>
+                        @endif
+                    </div>
+                </div>
+                
+                <div class="bill-amounts">
+                    <div class="amount-row">
+                        <span class="amount-label">Total Amount:</span>
+                        <span class="amount-value">₱{{ number_format($bill->final_total, 2) }}</span>
+                    </div>
+                    
+                    @if($bill->payments->isNotEmpty())
+                    <div class="amount-row">
+                        <span class="amount-label">Total Paid:</span>
+                        <span class="amount-value paid">₱{{ number_format($bill->payments->sum('amount'), 2) }}</span>
+                    </div>
+                    @endif
+                    
+                    <div class="amount-row balance-row">
+                        <span class="amount-label">Balance:</span>
+                        <span class="amount-value balance">₱{{ number_format($bill->balance, 2) }}</span>
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        @endif
+    </div>

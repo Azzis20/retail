@@ -17,7 +17,7 @@ class AdminProductController extends Controller
      public function index()
     {
 
-         $products = Product::latest()->paginate(5);
+         $products = Product::latest()->paginate(8);
 
    
         return view('admin.product.product-index',compact('products'))->with('category', 'all');
@@ -32,11 +32,6 @@ class AdminProductController extends Controller
         return view('admin.product.product-create');
     }
 
-    // 'product_name',
-    //     'category',
-    //     'price',
-    //     'unit',
-    // ];
 
 
 
@@ -62,12 +57,17 @@ class AdminProductController extends Controller
     {
         // Validate the request
         $validated = $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'name' => 'required|string|max:255',
             'category' => ['required', Rule::in(['grocery', 'vegetable'])],
             'price' => 'required|numeric|min:0',
             'unit' => 'required|string|max:50',
+            'available_stock' => 'required|numeric|min:0',
+            'min_threshold' => 'required|numeric|min:0',
+            
         ]);
+
+  
 
         // Handle image upload
         $imagePath = null;
@@ -85,6 +85,8 @@ class AdminProductController extends Controller
             'price' => $validated['price'],
             'category' => $validated['category'],
             'unit' => $validated['unit'],
+            'available_stock' => $validated['available_stock'],
+            'min_threshold' => $validated['min_threshold'],
         ]);
 
         // Redirect with success message
@@ -133,47 +135,16 @@ class AdminProductController extends Controller
         return view('admin.product.product-edit', compact('product'));
     }
 
-        // public function update(Request $request, string $id)
-        // {
-        //     $validated = $request->validate([
-        //         'name' => 'required|string|max:255',
-        //         'category' => 'required|in:grocery,vegetable',
-        //         'price' => 'required|numeric|min:0',
-        //         'unit' => 'required|in:per kilo,per piece,per pack,per bundle',
-        //         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
-        //     ]);
-
-        //     $product = Product::findOrFail($id);
-            
-        //     // Handle image upload
-        //     if ($request->hasFile('image')) {
-        //         if ($product->picture) {
-        //             Storage::disk('public')->delete($product->picture);
-        //         }
-        //         $path = $request->file('image')->store('products', 'public');
-        //         $validated['picture'] = $path;
-        //     }
-            
-            
-        //     $product->update([
-        //         'product_name' => $validated['name'],
-        //         'category' => $validated['category'],
-        //         'price' => $validated['price'],
-        //         'unit' => $validated['unit'],
-        //         'picture' => $validated['picture'] ?? $product->picture
-        //     ]);
-
-        //     return redirect()->route('admin.product.index')
-        //         ->with('success', 'Product updated successfully');
-        // }
-        public function update(Request $request, string $id)
+public function update(Request $request, string $id)
 {
     $validated = $request->validate([
         'name' => 'required|string|max:255',
         'category' => 'required|in:grocery,vegetable',
         'price' => 'required|numeric|min:0',
-        'unit' => 'required|in:per kg,piece,pack,bundle',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+        'unit' => 'required|in:kg,piece,pack,bundle',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        'available_stock' => 'required|numeric|min:0',
+        'min_threshold' => 'required|numeric|min:0'
     ]);
 
     $product = Product::findOrFail($id);
@@ -200,7 +171,9 @@ class AdminProductController extends Controller
         'category' => $validated['category'],
         'price' => $validated['price'],
         'unit' => $validated['unit'],
-        'picture' => $imagePath
+        'picture' => $imagePath,
+        'available_stock' => $validated['available_stock'],
+        'min_threshold' => $validated['min_threshold']
     ]);
 
     return redirect()->route('admin.product.index')
@@ -208,11 +181,6 @@ class AdminProductController extends Controller
 }
 
     
-
-    /**
-     * Update the specified resource in storage.
-     */
- 
 
     /**
      * Remove the specified resource from storage.

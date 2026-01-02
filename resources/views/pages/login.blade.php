@@ -10,9 +10,9 @@
 <div class="auth-container">
     <div class="logo-section">
         <div class="logo-circle">
-            <i class="fas fa-apple-alt"></i>
+            <i class="fa-solid fa-basket-shopping"></i>
         </div>
-        <div class="logo-text">SukiOrder</div>
+        <div class="logo-text">HarisStore</div>
     </div>
 
     <h1 class="page-title">Login</h1>

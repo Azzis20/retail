@@ -63,3 +63,12 @@
     border-top-right-radius: 0.25rem;
     border-bottom-right-radius: 0.25rem;
 }
+.haader-details-section {
+    display: flex;
+    justify-content: space-between; /* Space out the items */
+    align-items: center; /* Align items vertically centered */
+}
+
+.details-section-Edit {
+    cursor: pointer; /* Optional: Add a cursor to indicate it's clickable */
+}

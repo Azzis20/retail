@@ -1,8 +1,8 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Add Product')
+@section('title', 'Inventory Management')
 
-@section('page-title', 'Add Product')
+@section('page-title', 'Inventory Management')
 
 @section('content')
 
@@ -16,7 +16,7 @@
         <a href="{{ route('admin.product.index') }}" class="back-button">
             <i class="fa-solid fa-chevron-left"></i>
         </a>
-        <h1>Product</h1>
+        <h1>Add Product</h1>
     </div>
 
     <form action="{{ route('admin.product.store') }}" method="POST" enctype="multipart/form-data" class="product-form">
@@ -87,14 +87,55 @@
             <div class="form-group">
                 <label class="form-label">Unit</label>
                 <select name="unit" class="form-select" required>
-                    <option value="">e.g., per kilo</option>
-                    <option value="per kilo">per kilo</option>
-                    <option value="per piece">per piece</option>
-                    <option value="per pack">per pack</option>
-                    <option value="per bundle">per bundle</option>
+                    <option value="">e.g., per kg</option>
+                    <option value="kilo">kg</option>
+                    <option value="piece">piece</option>
+                    <option value="pack">pack</option>
+                    <option value="bundle">bundle</option>
                 </select>
             </div>
         </div>
+           
+            <!-- Available Stock -->
+        <div class="form-group">
+            <label class="form-label">Available Stock</label>
+            <input 
+                type="number" 
+                name="available_stock" 
+                class="form-input @error('available_stock') input-error @enderror" 
+                placeholder="Enter available stock"
+                value="{{ old('available_stock') }}"
+                required
+                min="0"
+            >
+            @error('available_stock')
+                <span class="text-danger">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    {{ $message }}
+                </span>
+            @enderror
+        </div>
+
+        <!-- Min Threshold -->
+        <div class="form-group">
+            <label class="form-label">Min Threshold</label>
+            <input 
+                type="number" 
+                name="min_threshold" 
+                class="form-input @error('min_threshold') input-error @enderror" 
+                placeholder="Enter minimum threshold"
+                value="{{ old('min_threshold') }}"
+                required
+                min="0"
+            >
+            @error('min_threshold')
+                <span class="text-danger">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    {{ $message }}
+                </span>
+            @enderror
+        </div>
+
 
         <!-- Save Button -->
         <button type="submit" class="btn-save">

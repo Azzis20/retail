@@ -10,59 +10,97 @@
     <h1 class="order-history-title">Order History</h1>
 
     <!-- Search Bar -->
-    <div class="search-container">
-        <i class="fa-solid fa-magnifying-glass search-icon"></i>
-        <input type="text" class="search-input" placeholder="search product..">
-    </div>
+    <form action="{{ route('admin.order.search',$orders) }}" method="GET" class="search-form">
+        <div class="search-container">
+            <button type="submit" class="search-btn" aria-label="Search">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+            </button>
+            <input 
+                type="text" 
+                name="search" 
+                class="search-input" 
+                placeholder="search product.." 
+                value="{{ request('search') }}"
+            >
+        </div>
+    </form>
 
     <!-- Filter Tabs -->
-    <div class="order-filter-tabs">
-        <button class="order-tab active" data-filter="all">All</button>
-        <button class="order-tab" data-filter="completed">Completed</button>
-        <button class="order-tab" data-filter="in-progress">In progress</button>
+     <div class="category-tabs">
+        
+        <a href="{{ route('admin.order.index') }}" class="category-tab {{ $status == 'all' ? 'active' : '' }}">All</a>
+        
+
+        <a href="{{ route('admin.order.pending') }}" class="category-tab  {{ $status == 'pending' ? 'active' : '' }}">Pending</a>
+
+        <a href="{{ route('admin.order.ofd') }}" class="category-tab {{ $status == 'Out-for-delivery' ? 'active' : '' }}">Out for Delivery</a>
+
+        <a href="{{ route('admin.order.completed') }}" class="category-tab  {{ $status == 'completed' ? 'active' : '' }}">Completed</a>
+
     </div>
+    
 
     <!-- Orders List -->
     <div class="orders-list">
-
-    
-
-        @foreach($orders as $order)
-        <div class="order-card" data-status="{{ strtolower($order->status) }}">
-            <a href="{{ route('admin.order.show',$order->id) }}">
-            <div class="order-card-header">
-                <div class="order-date">
-                    <i>📅</i>
-                    <span>{{ $order->created_at->format('F d, Y') }}</span>
-                </div>
-                <div class="order-total">
-                    <span class="total-label">{{ $order->status === 'cancelled' ? 'Total Paid' : 'Total' }}</span>
-                    <span class="total-amount">₱{{ number_format($order->total, 2) }}</span>
-                </div>
-            </div>
-
-            <h3 class="order-customer-name">{{ $order->customer->fname . ' ' . $order->customer->lname }}</h3>
-
-
-
-            <div class="order-status-badge {{ strtolower($order->status) }}-badge">
-                {{ ucfirst($order->status) }}
-            </div>
-
-            <!-- <button class="order-confirm-btn {{ $order->status === 'cancelled' ? 'disabled-btn' : 'active-btn' }}" 
-                    {{ $order->status === 'cancelled' ? 'disabled' : '' }}>
-                Confirm
-            </button> -->
-        </a>
+    @if ($orders->isEmpty())
+        <div class="no-products-message">
+                <i class="fa-solid fa-box-open"></i>
+                <p>No orders found</p>
+                @if(request('search'))
+                <a href="{{ route('admin.order.index') }}" class="btn-clear-search">Clear Search</a>
+                @endif
         </div>
+    @else
+        @foreach($orders as $order)
+            <div class="order-card" data-status="{{ strtolower($order->status) }}">
+                <a href="{{ route('admin.order.show',$order->id) }}">
+                    <div class="order-card-header">
+
+                        <div class="order-date">
+                            <h4>
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <span>{{ $order->created_at->format('F d, Y') }}</span>
+                            </h4>
+                        </div>
+                        <div class="order-total">
+                            <span class="total-label">{{ $order->status === 'cancelled' ? 'Total Paid' : 'Total' }}</span>
+                            <span class="total-amount">
+                                ₱{{ $order->bill ? number_format($order->bill->balance, 2) : '0.00' }}
+                            </span>
+                        </div>
+                    </div>
+                    <span class="info-value">ORD{{ str_pad($order->id, 2, '0', STR_PAD_LEFT) }}</span>
+
+                    <h3 class="order-customer-name">{{ $order->customer->fname . ' ' . $order->customer->lname }}</h3>
+
+                    <span class="order-status-badge 
+                            @if($order->status == 'pending') pending-badge
+                            @elseif($order->status == 'confirmed') confirmed-badge
+                            @elseif($order->status == 'out-for-delivery') delivery-badge
+                            @elseif($order->status == 'completed') completed-badge
+                            @elseif($order->status == 'cancelled') cancelled-badge
+                            @endif">
+                            @if($order->status == 'pending') Pending
+                            @elseif($order->status == 'out-for-delivery') Out for Delivery
+                            @elseif($order->status == 'completed') Completed
+                            @elseif($order->status == 'cancelled') Cancelled
+                            @endif
+                    </span>
+                    
+
+                </a>
+            </div>
         @endforeach
-
-        
-
-        
-
-    </div>
+    @endif  
 </div>
+
+<!-- Paginator -->
+    <div>
+            {{ $orders->appends(request()->query())->links() }}
+    </div>
+
+</div>
+
 
 <script>
     // Filter functionality
@@ -75,17 +113,21 @@
             const filter = this.dataset.filter;
             const orders = document.querySelectorAll('.order-card');
             
-            orders.forEach(order => {
-                if (filter === 'all') {
-                    order.style.display = 'block';
-                } else if (filter === 'completed') {
-                    // Show completed orders (you'll need to add data-status="completed" to completed orders)
-                    order.style.display = order.dataset.status === 'completed' ? 'block' : 'none';
-                } else if (filter === 'in-progress') {
-                    // Show in-progress orders
-                    order.style.display = order.dataset.status === 'pending' ? 'block' : 'none';
-                }
-            });
+                orders.forEach(order => {
+    if (filter === 'all') {
+        order.style.display = 'block';
+    } else if (filter === 'completed') {
+        // Show completed orders (you'll need to add data-status="completed" to completed orders)
+        order.style.display = order.dataset.status === 'completed' ? 'block' : 'none';
+    } else if (filter === 'pending') {
+        // Show pending orders
+        order.style.display = order.dataset.status === 'pending' ? 'block' : 'none';
+    } else if (filter === 'Out-for-delivery') {
+        // Show out-for-delivery orders
+        order.style.display = order.dataset.status === 'Out-for-delivery' ? 'block' : 'none';
+    }
+});
+
         });
     });
 

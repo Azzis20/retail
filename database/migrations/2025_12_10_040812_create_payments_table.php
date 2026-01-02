@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('bill_id')->constrained('bills')->onDelete('cascade');
             $table->foreignId('customer_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('recorded_by')->nullable()->constrained('users')->onDelete('set null');
             $table->decimal('amount',10,2);
             $table->timestamps();
         });

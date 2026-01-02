@@ -15,6 +15,8 @@ class Order extends Model
         'processed_by',
         'status',
         'notes',
+
+        
     ];
 
     /**
@@ -28,15 +30,15 @@ class Order extends Model
     }
 
     // The staff/user who processed the order
-    public function processor()
+    public function processedBy()
     {
         return $this->belongsTo(User::class, 'processed_by');
     }
 
     // The order items associated with this order
-    public function items()
+      public function orderItems()
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasMany(OrderItem::class); // Make sure OrderItem model exists
     }
 
     // The bill associated with this order

@@ -1,23 +1,107 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Dashboard</title>
-</head>
-<body>
+@extends('customer.layouts.app')
 
-<div>
-    <h1>
-        Customer Dashboard
-    </h1>
+@section('title', 'Dashboard')
 
-    <form method="POST" action="{{ route('logout') }}">
-    @csrf
-    <button type="submit">Logout</button>
-</form>
+@section('page-title', 'Dashboard')
+
+@section('content')
+
+<div class="dashboard-header">
+        <p class="date-text">Today, {{ date('d F') }}</p>
+        <h1 class="greeting">{{ auth()->user()->fname . ' ' . auth()->user()->lname }}</h1>
+    </div>
+
+    <h2 class="section-title">Today's Overview</h2>
+    
+    <div class="stats-container"> 
+
+        <!-- Fixed: Removed action-card class wrapper, using stat-card-link instead -->
+        <a href="{{ route('customer.bill.index') }}" class="stat-card-link">
+            <div class="stat-card">  
+                <div class="stat-content">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-file-invoice"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Balance</p>
+                        <h3 class="stat-value"> &#8369;{{$totalBalance}} </h3>
+                    </div>
+                </div>
+            </div>
+        </a>
+        
+        <a href="{{ route('customer.order.index') }}" class="stat-card-link"> 
+            <div class="stat-card">  
+                <div class="stat-content">
+                    <div class="stat-icon">
+                       <i class="fa-solid fa-basket-shopping"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Total Order</p>
+                        <h3 class="stat-value">{{$totalOrder}} </h3>
+                    </div>
+                </div>
+            </div>
+        </a>
+
+
+
+        </div>
+            <div class="orders-header">
+            <h2 class="section-title">Recent Orders</h2>
+            <a href="{{ route('customer.order.index') }}" class="view-all-link">View All</a>
+        </div>
+
+        <div class="orders-container">
+        @if ($orders->isEmpty())
+            <div class="no-products-message">
+                    <i class="fa-solid fa-box-open"></i>
+                    <p>No orders found</p>
+                    @if(request('search'))
+                    <a href="{{ route('admin.order.index') }}" class="btn-clear-search">Clear Search</a>
+                    @endif
+            </div>
+        @else
+        @foreach($orders as $order) 
+
+        <a href="{{ route('customer.order.show',$order->id) }}">
+            <div class="order-card-item">
+                
+                <div class="order-info">
+                    
+                    <p class="order-number">Order: {{$order->id}}</p>
+                    <div class="customer-info">
+                        <div class="customer-avatar">{{ substr($order->customer->fname, 0, 1) }}</div>
+                        <span class="customer-name">{{ $order->customer->fname . ' ' . $order->customer->lname }}</span>
+                    </div>
+                </div>
+               
+                    <span class="order-status-badge 
+                            @if($order->status == 'pending') pending-badge
+                            @elseif($order->status == 'confirmed') confirmed-badge
+                            @elseif($order->status == 'out-for-delivery') delivery-badge
+                            @elseif($order->status == 'completed') completed-badge
+                            @elseif($order->status == 'cancelled') cancelled-badge
+                            @endif">
+                            @if($order->status == 'pending') Pending
+                            @elseif($order->status == 'out-for-delivery') Out for Delivery
+                            @elseif($order->status == 'completed') Completed
+                            @elseif($order->status == 'cancelled') Cancelled
+                            @endif
+                    </span>
+                
+                </div>
+            </a>
+            @endforeach
+        @endif  
+        </div>
+            <div class="orders-header">
+            <h2 class="section-title">Order Completed</h2>
+            <a href="{{ route('customer.order.index') }}" class="view-all-link">View All</a>
+        </div>
 
 </div>
     
-</body>
-</html>
+
+
+@endsection

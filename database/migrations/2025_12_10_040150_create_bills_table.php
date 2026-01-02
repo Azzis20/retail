@@ -18,7 +18,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->decimal('total_amount', 10, 2);
-            $table->decimal('adjusted_amount',10,2)->nullable();
+            // $table->decimal('adjusted_amount',10,2)->nullable();
+            $table->string('payment_status')->default('unpaid');
             $table->decimal('balance', 10, 2)->default(0); 
             $table->timestamps();
                     

@@ -20,7 +20,7 @@
                 type="text" 
                 name="search" 
                 class="search-input" 
-                placeholder="search for the staff.." 
+                placeholder="Search for staff members..." 
                 value="{{ request('search') }}"
             >
         </div>
@@ -29,48 +29,99 @@
     <!-- Add Staff Button -->
     <a href="{{ route('admin.add.staff') }}" class="btn-add-product">
         <i class="fa-solid fa-plus"></i>
-        <span>Add Staff</span>
+        <span>Add New Staff</span>
     </a>
 
-    <!-- Staff List Container -->
-    <div class="staff-list-container">
+    <!-- Staff Grid Container -->
+    <div class="staff-grid-container">
         @forelse($staffs as $staff)
-            <a href="{{ route('admin.manage.show', $staff->id) }}" class="staff-card-link">
-                <div class="staff-card">
-                    <!-- Avatar -->
-                    <div class="staff-avatar">
+            <a href="{{ route('admin.manage.show', $staff->id) }}" class="staff-card-enhanced">
+                <!-- Staff Card Header with Avatar -->
+                <div class="staff-card-header-section">
+                    <div class="staff-avatar-large">
                         @if($staff->profile_picture)
-                            <img src="{{ asset('storage/' . $staff->profile_picture) }}" alt="{{ $staff->firstname }}" class="staff-avatar-img">
+                            <img src="{{ asset('storage/' . $staff->profile_picture) }}" 
+                                 alt="{{ $staff->fname }}" 
+                                 class="staff-avatar-img">
                         @else
-                            <span class="staff-avatar-initials">
-                                {{ strtoupper(substr($staff->fname, 0, 1)) }}
+                            <span class="staff-avatar-initials-large">
+                                {{ strtoupper(substr($staff->fname, 0, 1)) }}{{ strtoupper(substr($staff->lname, 0, 1)) }}
                             </span>
                         @endif
                     </div>
 
-                    <!-- Staff Info -->
-                    <div class="staff-info">
-                        <h3 class="staff-name">{{ $staff->fname }} {{ $staff->fname }}</h3>
-                        <p class="staff-role">{{ ucfirst($staff->role) }}</p>
+                    <!-- Role Badge -->
+                    <div class="staff-role-badge role-{{ strtolower($staff->role) }}">
+                        <i class="fa-solid fa-{{ $staff->role === 'admin' ? 'user-shield' : ($staff->role === 'vendor' ? 'store' : 'user') }}"></i>
+                        {{ ucfirst($staff->role) }}
                     </div>
+                </div>
 
-                    <!-- Arrow Icon -->
-                    <div class="staff-arrow">
-                        <i class="fa-solid fa-chevron-right"></i>
+                <!-- Staff Info Section -->
+                <div class="staff-info-section">
+                    <h3 class="staff-name-large">{{ $staff->fname }} {{ $staff->lname }}</h3>
+                    
+                    <!-- Contact Information -->
+                    <div class="staff-contact-info">
+                        <div class="staff-info-item">
+                            <i class="fa-solid fa-envelope"></i>
+                            <span class="staff-info-text">{{ $staff->email }}</span>
+                        </div>
+                        
+                        @if($staff->contact)
+                        <div class="staff-info-item">
+                            <i class="fa-solid fa-phone"></i>
+                            <span class="staff-info-text">{{ $staff->contact }}</span>
+                        </div>
+                        @endif
+
+                        @if($staff->address)
+                        <div class="staff-info-item">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span class="staff-info-text">{{ Str::limit($staff->address, 40) }}</span>
+                        </div>
+                        @endif
                     </div>
+                </div>
+
+                <!-- Card Footer -->
+                <div class="staff-card-footer">
+                    <span class="staff-view-details">
+                        View Details
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </span>
                 </div>
             </a>
         @empty
-            <div class="no-staff-message">
-                <i class="fa-solid fa-users"></i>
-                <p>No staff staff found</p>
-                
+            <div class="no-staff-message-enhanced">
+                <div class="no-staff-icon-wrapper">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <h3 class="no-staff-title">No Staff Members Found</h3>
+                <p class="no-staff-description">
+                    @if(request('search'))
+                        No results found for "{{ request('search') }}". Try a different search term.
+                    @else
+                        Get started by adding your first staff member to the team.
+                    @endif
+                </p>
+                @if(!request('search'))
+                <a href="{{ route('admin.add.staff') }}" class="btn-add-first-staff">
+                    <i class="fa-solid fa-plus"></i>
+                    Add First Staff Member
+                </a>
+                @else
+                <a href="{{ route('admin.manage.index') }}" class="btn-clear-search">
+                    <i class="fa-solid fa-xmark"></i>
+                    Clear Search
+                </a>
+                @endif
             </div>
         @endforelse
     </div>
 
-    <!-- Pagination (if needed) -->
-    @if(method_exists($staffs, 'links'))
+    <!-- Pagination -->
+    @if(method_exists($staffs, 'links') && $staffs->hasPages())
         <div class="pagination-wrapper">
             {{ $staffs->links() }}
         </div>

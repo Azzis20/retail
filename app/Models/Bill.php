@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 
 class Bill extends Model
 {
@@ -12,8 +15,8 @@ class Bill extends Model
     protected $fillable = [
         'order_id',
         'total_amount',      // automatic sum of order items
-        'adjusted_total',    // optional manual adjustment by owner
         'balance',
+        'payment_status',    // added
     ];
 
     protected $casts = [
@@ -22,15 +25,19 @@ class Bill extends Model
         'balance' => 'decimal:2',
     ];
     
+    // Payment status constants
+    const STATUS_UNPAID = 'unpaid';
+    const STATUS_PARTIALLY_PAID = 'partially_paid';
+    const STATUS_PAID = 'paid';
 
     // Relationship: Bill belongs to an Order
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
     // Relationship: Bill has many Payments
-    public function payments()
+    public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
     }
@@ -43,44 +50,41 @@ class Bill extends Model
     public function applyPayment($amount){
         $newBalance = $this->balance - $amount;
         
-        if ($newBalanceew <0){
+        if ($newBalance < 0){
             throw new \Exception("Payment exceeds the invoice balance");
         }
+        
         $this->balance = $newBalance;
+        $this->updatePaymentStatus();
         $this->save();
     }
-  protected static function boot(){
-    parent::boot();
 
-    static::creating(function($bill){
-        // Only set balance if not manually set
-        if (is_null($bill->balance)) {
-            $bill->balance = $bill->total_amount;
+    // Update payment status based on balance
+    protected function updatePaymentStatus(){
+        $finalTotal = $this->getFinalTotalAttribute();
+        
+        if ($this->balance == 0) {
+            $this->payment_status = self::STATUS_PAID;
+        } elseif ($this->balance < $finalTotal) {
+            $this->payment_status = self::STATUS_PARTIALLY_PAID;
+        } else {
+            $this->payment_status = self::STATUS_UNPAID;
         }
-    });
+    }
+
+    protected static function boot(){
+        parent::boot();
+
+        static::creating(function($bill){
+            // Only set balance if not manually set
+            if (is_null($bill->balance)) {
+                $bill->balance = $bill->total_amount;
+            }
+            
+            // Set initial payment status
+            if (is_null($bill->payment_status)) {
+                $bill->payment_status = self::STATUS_UNPAID;
+            }
+        });
+    }
 }
-
-}
-
-
-
-
-  // Update balance after payment
-    // public function updateBalance()
-    // {
-    //     $totalPaid = $this->payments()->sum('amount');
-    //     $this->balance = $this->final_total - $totalPaid;
-    //     if ($this->balance < 0) {
-    //         $this->balance = 0;
-    //     }
-    //     $this->save();
-    // }
-
-    // Automatically update balance after creating a payment
-    // protected static function booted()
-    // {
-    //     static::created(function ($bill) {
-    //         $bill->balance = $bill->final_total;
-    //         $bill->save();
-    //     });
-    // }

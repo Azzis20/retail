@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers; // Keep this one, as your class is App\Http\Controllers\Auth\AuthController
+namespace App\Http\Controllers; 
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Hash;
                 'last_name' => ['required', 'string', 'max:255'],
                 'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
                 'password' => ['required', 'string', 'min:8', 'confirmed'],
-                'contact' => ['required', 'string', 'max:20'],
+                'contact' => ['required|numeric|min:0'],
                 'address' => ['required', 'string', 'max:500'],
                 // 'role' => ['required', 'in:vendor,customer'], // Only allow vendor or customer registration
             
@@ -101,7 +101,7 @@ use Illuminate\Support\Facades\Hash;
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->route('login')->with('status', 'You have been logged out successfully.');
+            return redirect()->route('login.page')->with('status', 'You have been logged out successfully.');
         }
 
 

@@ -1,0 +1,63 @@
+<!-- Search Bar -->
+<div class="order-search-wrapper">
+    <form
+        action="{{ route('customer.order.index') }}"
+        method="GET"
+        class="order-search-form"
+    >
+        <div class="order-search-container">
+            <button type="submit" class="order-search-btn">
+                <i class="search-icon">🔍</i>
+            </button>
+            <input
+                type="text"
+                name="search"
+                class="order-search-input"
+                placeholder="Search orders..."
+                value="{{ request('search') }}"
+            />
+        </div>
+    </form>
+</div>
+
+<!-- Filter Tabs -->
+<div class="order-filter-tabs">
+    <a
+        href="{{ route('customer.orders.index') }}"
+        class="order-tab {{ !request('status') ? 'active' : '' }}"
+    >
+        All Orders
+    </a>
+    <a
+        href="{{ route('customer.orders.index', ['status' => 'pending']) }}"
+        class="order-tab {{ request('status') == 'pending' ? 'active' : '' }}"
+    >
+        Pending
+    </a>
+    <a
+        href="{{ route('customer.orders.index', ['status' => 'confirmed']) }}"
+        class="order-tab {{ request('status') == 'confirmed' ? 'active' : '' }}"
+    >
+        Confirmed
+    </a>
+    <a
+        href="{{ route('customer.orders.index', ['status' => 'out-for-delivery']) }}"
+        class="order-tab {{
+            request('status') == 'out-for-delivery' ? 'active' : ''
+        }}"
+    >
+        Out for Delivery
+    </a>
+    <a
+        href="{{ route('customer.orders.index', ['status' => 'completed']) }}"
+        class="order-tab {{ request('status') == 'completed' ? 'active' : '' }}"
+    >
+        Completed
+    </a>
+    <a
+        href="{{ route('customer.orders.index', ['status' => 'cancelled']) }}"
+        class="order-tab {{ request('status') == 'cancelled' ? 'active' : '' }}"
+    >
+        Cancelled
+    </a>
+</div>

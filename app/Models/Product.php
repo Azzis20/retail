@@ -14,6 +14,8 @@ class Product extends Model
         'category',
         'price',
         'unit',
+        'min_threshold',
+        'available_stock'
     ];
 
     // If you want price always cast to decimal when using the model
@@ -23,17 +25,37 @@ class Product extends Model
   
 
     // Relationships (optional, depending on your app)
-    public function orderItems():HasMany
+    public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
-public function getImageAttribute()
-{
-    if ($this->picture) {
-        return asset($this->picture);
+
+    // Relationship to Cart ← ADD THIS
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(Cart::class);
     }
 
-    return null;
+    public function getImageAttribute()
+    {
+        if ($this->picture) {
+            return asset($this->picture);
+        }
+        return null;
+    }
+    
+public function getStockStatus()
+{
+    if ($this->available_stock <= 0) {
+        return 'out-of-Stock';
+    }
+
+    if ($this->available_stock <= $this->min_threshold) {
+        return 'low-stock';
+    }
+
+    return 'available';
 }
+
     
 }

@@ -1,8 +1,8 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Manage Product')
+@section('title', 'Inventory Management')
 
-@section('page-title', 'Product Management')
+@section('page-title', 'Inventory Management')
 
 @section('content')
 
@@ -32,13 +32,7 @@
         <span>Add Product</span>
     </a>    
 
-    <!-- Category Filter Tabs -->
-    <!-- <div class="category-tabs">
-        
-        <button class="category-tab active" data-category="all">All</button>
-        <button class="category-tab" data-category="vegetables">Vegetables</button>
-        <button class="category-tab" data-category="grocery">Grocery</button>
-    </div> -->
+  
     <div class="category-tabs">
         
         <a href="{{ route('admin.product.index') }}" class="category-tab {{ $category == 'all' ? 'active' : '' }}">All</a>
@@ -82,12 +76,12 @@
                 <div class="product-details">
                     <h3 class="product-name">{{ $product->product_name }}</h3>
                     <p class="product-price">₱{{ number_format($product->price, 2) }}</p>
-                    @if(isset($product->availability))
-                    <span class="availability-badge {{ $product->availability ? 'available' : 'unavailable' }}">
-                        <i class="fa-solid fa-{{ $product->availability ? 'check' : 'xmark' }}"></i>
-                        {{ $product->availability ? 'Available' : 'Unavailable' }}
+                    
+                    <span class="availability-badge {{ $product->getStockStatus() }}">
+                    {{ $product->getStockStatus() }}
                     </span>
-                    @endif
+                                    
+                    
                 </div>
             </div>
             <a href="{{ route('admin.product.edit', $product->id) }}" class="btn-make-changes">
@@ -98,13 +92,13 @@
         
         @empty
         
-        <div class="no-products-message">
-            <i class="fa-solid fa-box-open"></i>
-            <p>No products found</p>
-            @if(request('search'))
-            <a href="{{ route('admin.product.index') }}" class="btn-clear-search">Clear Search</a>
-            @endif
-        </div>
+            <div class="no-products-message">
+                <i class="fa-solid fa-box-open"></i>
+                <p>No products found</p>
+                @if(request('search'))
+                <a href="{{ route('admin.product.index') }}" class="btn-clear-search">Clear Search</a>
+                @endif
+            </div>
         
         @endforelse
 
@@ -142,3 +136,30 @@
 </script>
 
 @endsection
+
+<style>
+  .availability-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: capitalize;
+    color: white;
+  }
+
+  /* Available (Green) */
+  .availability-badge.available {
+    background-color: #28a745; /* Green */
+  }
+
+  /* Low Stock (Yellow) */
+  .availability-badge.low-stock {
+    background-color: #ffc107; /* Yellow */
+  }
+
+  /* Out of Stock (Red) */
+  .availability-badge.out-of-stock {
+    background-color: #dc3545; /* Red */
+  }
+</style>

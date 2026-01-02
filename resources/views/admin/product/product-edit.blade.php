@@ -1,8 +1,8 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Edit Product')
+@section('title', 'Inventory Management')
 
-@section('page-title', 'Edit Product')
+@section('page-title', 'Inventory Management')
 
 @section('content')
 
@@ -31,7 +31,7 @@
         <a href="{{ route('admin.product.index') }}" class="back-button">
             <i class="fa-solid fa-chevron-left"></i>
         </a>
-        <h1>Product</h1>
+        <h1>Edit Product</h1>
     </div>
 
   <form action="{{ route('admin.product.update', $product->id) }}" method="POST" enctype="multipart/form-data" class="product-form">
@@ -122,10 +122,10 @@
             <label class="form-label">Unit</label>
             <select name="unit" class="form-select @error('unit') input-error @enderror" required>
                 <option value="">e.g., per kilo</option>
-                <option value="kg" {{ old('unit', $product->unit) == 'kg' ? 'selected' : '' }}>per kilo</option>
-                <option value="piece" {{ old('unit', $product->unit) == 'piece' ? 'selected' : '' }}>per piece</option>
-                <option value="pack" {{ old('unit', $product->unit) == 'pack' ? 'selected' : '' }}>per pack</option>
-                <option value="bundle" {{ old('unit', $product->unit) == 'bundle' ? 'selected' : '' }}>per bundle</option>
+                <option value="kg" {{ old('unit', $product->unit) == 'kg' ? 'selected' : '' }}>kg</option>
+                <option value="piece" {{ old('unit', $product->unit) == 'piece' ? 'selected' : '' }}>piece</option>
+                <option value="pack" {{ old('unit', $product->unit) == 'pack' ? 'selected' : '' }}>pack</option>
+                <option value="bundle" {{ old('unit', $product->unit) == 'bundle' ? 'selected' : '' }}>bundle</option>
             </select>
             @error('unit')  
                 <span class="error-message">
@@ -135,6 +135,46 @@
             @enderror
         </div>
     </div>
+
+     <!-- Available Stock -->
+        <div class="form-group">
+            <label class="form-label">Available Stock</label>
+            <input 
+                type="number" 
+                name="available_stock" 
+                class="form-input @error('available_stock') input-error @enderror" 
+                placeholder="Enter available stock"
+                value="{{ old('available_stock', $product->available_stock) }}"
+                required
+                min="0"
+            >
+            @error('available_stock')
+                <span class="error-message">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    {{ $message }}
+                </span>
+            @enderror
+        </div>
+
+          <!-- Min Threshold -->
+        <div class="form-group">
+            <label class="form-label">Min Threshold</label>
+            <input 
+                type="number" 
+                name="min_threshold" 
+                class="form-input @error('min_threshold') input-error @enderror" 
+                placeholder="Enter minimum threshold"
+                value="{{ old('min_threshold', $product->min_threshold) }}"
+                required
+                min="0"
+            >
+            @error('min_threshold')
+                <span class="error-message">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    {{ $message }}
+                </span>
+            @enderror
+        </div>
 
     <!-- Submit Button -->
     <button type="submit" class="btn-save">

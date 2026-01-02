@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin Panel')</title>
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     <link rel="stylesheet" href="{{ asset('css/pagination.css') }}">
@@ -32,13 +33,21 @@
 
             <li class="nav-item">
                 <a href="{{ route('admin.product.index') }}" class="nav-link {{ request()->routeIs('admin.product*') ? 'active' : '' }}">
-                    <i class="fa-solid fa-carrot"></i> Product
+                    <i class="fa-solid fa-boxes-stacked"></i> Inventory
                 </a>
             </li>
+
+
+            
 
             <li class="nav-item">
                 <a href="{{ route('admin.order.index') }}" class="nav-link {{ request()->routeIs('admin.order*') ? 'active' : '' }}">
                     <i class="fa-solid fa-basket-shopping"></i> Order
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.sales.index') }}" class="nav-link {{ request()->routeIs('admin.sales*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-chart-line"></i> Sales
                 </a>
             </li>
 
@@ -47,15 +56,21 @@
                     <i class="fa-solid fa-people-roof"></i> Manage
                 </a>
             </li>
-
             <li class="nav-item">
-                <form method="POST" action="{{ route('logout') }}" id="logoutForm">
+                <a href="{{ route('admin.customer.index') }}" class="nav-link {{ request()->routeIs('admin.customer*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-user"></i> Client
+                </a>
+            </li>
+            <!-- style="padding-top:400px;" -->
+            <li class="nav-item"> 
+                <button type="button" onclick="openLogoutModal()" class="nav-link logout-btn">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+                </button>
+                <form method="POST" action="{{ route('logout') }}" id="logoutForm" style="display: none;">
                     @csrf
-                    <button type="button" onclick="confirmLogout()" class="nav-link" style="background:none;border:none;width:100%;text-align:left;cursor:pointer;">
-                        <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-                    </button>
                 </form>
             </li>
+            
              
     
           
@@ -72,6 +87,7 @@
                     <!-- Success/Error Messages -->
                     @if(session('success'))
                         <div class="alert alert-success">
+                            <i class="fa-solid fa-check-circle"></i>
                             {{ session('success') }}
                         </div>
                     @endif
@@ -118,12 +134,67 @@
             }
         });
 
-        // Logout confirmation
-        function confirmLogout() {
-            if (confirm('Are you sure you want to logout?')) {
-                document.getElementById('logoutForm').submit();
+        
+                // Logout Modal Functions
+        function openLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closeLogoutModal() {
+            const modal = document.getElementById('logoutModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        function confirmLogoutAction() {
+            document.getElementById('logoutForm').submit();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('logoutModal')?.addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeLogoutModal();
             }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('logoutModal');
+                if (modal && modal.classList.contains('active')) {
+                    closeLogoutModal();
+                }
+            }
+        });
+
+        // Legacy support for existing confirmLogout function
+        function confirmLogout() {
+            openLogoutModal();
         }
     </script>
+
+    <!-- Logout Confirmation Modal -->
+<div class="logout-modal-overlay" id="logoutModal">
+    <div class="logout-modal-content">
+        <div class="logout-modal-icon">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </div>
+        <h3 class="logout-modal-title">Confirm Logout</h3>
+        <p class="logout-modal-message">Are you sure you want to logout? You'll need to sign in again to access your account.</p>
+        <div class="logout-modal-actions">
+            <button type="button" class="btn-logout-cancel" onclick="closeLogoutModal()">
+                <i class="fa-solid fa-xmark"></i>
+                Cancel
+            </button>
+            <button type="button" class="btn-logout-confirm" onclick="confirmLogoutAction()">
+                <i class="fa-solid fa-check"></i>
+                Yes, Logout
+            </button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

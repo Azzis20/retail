@@ -1,0 +1,38 @@
+ @if($order->status == 'pending')
+        <div class="order-actions">
+            <form action="{{ route('customer.order.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order?')">
+                @csrf
+                @method('PATCH')
+                <button type="submit" class="btn-cancel-order">Cancel Order</button>
+            </form>
+        </div>
+    @endif
+
+
+
+
+    @if($order->bill && $order->bill->adjusted_amount)
+                <div class="info-row">
+                    <span class="info-label">Adjustment</span>
+                    <span class="info-value">₱{{ number_format($order->bill->adjusted_amount, 2) }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Adjusted Total</span>
+                    <span class="info-value">₱{{ number_format($order->bill->total_amount + $order->bill->adjusted_amount, 2) }}</span>
+                </div>
+            @endif
+
+
+             <div class="info-row">
+                <span class="info-label">Subtotal</span>
+                <span class="info-value">₱{{ number_format($order->bill->total_amount ?? 0, 2) }}</span>
+            </div>
+
+
+
+             @if($order->bill && $order->bill->balance > 0)
+                <div class="info-row balance-row">
+                    <span class="info-label">Balance</span>
+                    <span class="info-value balance-amount">₱{{ number_format($order->bill->balance, 2) }}</span>
+                </div>
+            @endif

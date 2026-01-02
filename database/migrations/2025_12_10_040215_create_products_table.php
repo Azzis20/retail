@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('picture')->nullable();   // FIXED typo: strinng → string
+            $table->string('picture')->nullable();   
             $table->string('product_name');
             $table->string('category');
             $table->decimal('price', 10, 2);
+            $table->unsignedInteger('available_stock')->default(0);  // Tracks current stock level
+            $table->unsignedInteger('min_threshold')->default(0); 
             $table->string('unit');
             $table->timestamps();
         });

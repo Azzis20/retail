@@ -1,18 +1,25 @@
 <?php
 
-namespace App\Http\Controllers\Vendor;
+namespace App\Http\Controllers\Customer;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
-class ManageController extends Controller
+class ProfileController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(String $id)
     {
-       
+        //
+        $user = User::findOrFail(auth()->id());
+
+        
+        return view('customer.profile.profile-index', compact('user'));
+         
     }
 
     /**
